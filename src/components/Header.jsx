@@ -1,5 +1,16 @@
 import { useState } from 'react';
-import { Search, ShoppingCart, Heart, User, X } from 'lucide-react';
+import {
+  Search,
+  ShoppingCart,
+  Heart,
+  User,
+  X,
+  House,
+  Percent,
+  Star,
+  Tags,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -7,35 +18,44 @@ export default function Header() {
   return (
     <>
       <header className="bg-white shadow-sm">
-        {/* Top banner */}
         <div className="bg-indigo-600 text-white px-4 py-2 text-center text-sm">
           <p>Free shipping on orders over $100 | Shop Now!</p>
         </div>
 
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
             <a href="/" className="text-2xl font-bold text-indigo-600">
               ShopEase
             </a>
 
-            {/* Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-700 hover:text-indigo-600">
-                Home
-              </a>
-              <a href="/shop" className="text-gray-700 hover:text-indigo-600">
-                Shop
-              </a>
-              <a
-                href="/featured"
-                className="text-gray-700 hover:text-indigo-600"
+              <Link
+                to="/"
+                className="flex items-center gap-1 Stext-gray-700 hover:text-indigo-600"
               >
+                <House className="h-4 w-4 " />
+                Home
+              </Link>
+              <Link
+                href="/shop"
+                className="flex items-center gap-1 text-gray-700 hover:text-indigo-600"
+              >
+                <Tags className="h-4 w-4" />
+                Shop
+              </Link>
+              <Link
+                href="/featured"
+                className="flex items-center gap-1 text-gray-700 hover:text-indigo-600"
+              >
+                <Star className="h-4 w-4" />
                 Featured
-              </a>
-              <a href="/deals" className="text-gray-700 hover:text-indigo-600">
-                Deals
-              </a>
+              </Link>
+              <Link
+                href="/deals"
+                className="flex items-center gap-1 text-gray-700 hover:text-indigo-600"
+              >
+                <Percent className="h-4 w-4" /> Deals
+              </Link>
             </nav>
 
             {/* Actions */}
@@ -60,14 +80,14 @@ export default function Header() {
                 </div>
               </a>
 
-              <a href="/cart" className="text-gray-700 hover:text-indigo-600">
+              <Link to="/cart" className="text-gray-700 hover:text-indigo-600">
                 <div className="relative">
                   <ShoppingCart className="w-6 h-6" />
                   <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">
                     3
                   </span>
                 </div>
-              </a>
+              </Link>
 
               <a
                 href="/profile"

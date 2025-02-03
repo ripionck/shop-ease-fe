@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import Layout from './components/Layout';
+import ShoppingCart from './pages/ShoppingCart';
 
 export default function App() {
   return (
@@ -13,11 +14,12 @@ export default function App() {
           <Route index element={<Home />} />
           {/* <Route path="shop" element={<ProductListingPage />} />
           <Route path="product/:id" element={<ProductDetailPage />} />
-          <Route path="cart" element={<ShoppingCartPage />} />
+         
           <Route path="checkout" element={<CheckoutPage />} />
           <Route path="dashboard" element={<UserDashboardPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="wishlist" element={<WishlistPage />} /> */}
+          <Route path="cart" element={<ShoppingCart />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>
