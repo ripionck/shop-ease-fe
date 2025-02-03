@@ -89,12 +89,12 @@ export default function Header() {
                 </div>
               </Link>
 
-              <a
-                href="/profile"
+              <Link
+                to="/profile"
                 className="text-gray-700 hover:text-indigo-600"
               >
                 <User className="w-6 h-6" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ import Checkout from './pages/Checkout';
 import FlashDeals from './pages/FlashDeals';
 import Products from './pages/Products';
 import Wishlist from './pages/Wishlist';
+import UserDashboard from './pages/UserDashboard';
 
 export default function App() {
   return (
@@ -18,9 +19,6 @@ export default function App() {
           <Route index element={<Home />} />
           {/* <Route path="shop" element={<ProductListingPage />} />
           <Route path="product/:id" element={<ProductDetailPage />} />
-         
-          
-          <Route path="dashboard" element={<UserDashboardPage />} />
           <Route path="orders" element={<OrdersPage />} />
            */}
           <Route path="shop" element={<Products />} />
@@ -30,6 +28,7 @@ export default function App() {
           <Route path="checkout" element={<Checkout />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="dashboard" element={<UserDashboard />} />
         </Route>
         {/* <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
