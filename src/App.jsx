@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import Layout from './components/Layout';
 import ShoppingCart from './pages/ShoppingCart';
+import Checkout from './pages/Checkout';
 
 export default function App() {
   return (
@@ -15,11 +16,12 @@ export default function App() {
           {/* <Route path="shop" element={<ProductListingPage />} />
           <Route path="product/:id" element={<ProductDetailPage />} />
          
-          <Route path="checkout" element={<CheckoutPage />} />
+          
           <Route path="dashboard" element={<UserDashboardPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="wishlist" element={<WishlistPage />} /> */}
           <Route path="cart" element={<ShoppingCart />} />
+          <Route path="checkout" element={<Checkout />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>

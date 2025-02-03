@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Minus, Plus, Trash2, Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 const initialProducts = [
   {
     id: '1',
@@ -149,10 +150,13 @@ export default function ShoppingCart() {
                   </button>
                 </div>
 
-                <button className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center justify-center gap-2">
+                <Link
+                  to="/checkout"
+                  className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center justify-center gap-2"
+                >
                   <Lock className="w-4 h-4" />
                   Proceed to Checkout
-                </button>
+                </Link>
 
                 <div className="text-center text-sm text-gray-500">
                   We accept:
