@@ -37,7 +37,7 @@ export default function Header() {
                 Home
               </Link>
               <Link
-                href="/shop"
+                to="/shop"
                 className="flex items-center gap-1 text-gray-700 hover:text-indigo-600"
               >
                 <Tags className="h-4 w-4" />
@@ -68,8 +68,8 @@ export default function Header() {
                 <Search className="w-6 h-6" />
               </button>
 
-              <a
-                href="/wishlist"
+              <Link
+                to="/wishlist"
                 className="text-gray-700 hover:text-indigo-600"
               >
                 <div className="relative">
@@ -78,7 +78,7 @@ export default function Header() {
                     2
                   </span>
                 </div>
-              </a>
+              </Link>
 
               <Link to="/cart" className="text-gray-700 hover:text-indigo-600">
                 <div className="relative">

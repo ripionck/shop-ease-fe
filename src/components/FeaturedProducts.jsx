@@ -53,7 +53,7 @@ const products = [
 
 const StarRating = ({ rating, reviews }) => {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center">
       {[...Array(5)].map((_, i) => (
         <svg
           key={i}

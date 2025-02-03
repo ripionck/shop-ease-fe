@@ -7,6 +7,8 @@ import Layout from './components/Layout';
 import ShoppingCart from './pages/ShoppingCart';
 import Checkout from './pages/Checkout';
 import FlashDeals from './pages/FlashDeals';
+import Products from './pages/Products';
+import Wishlist from './pages/Wishlist';
 
 export default function App() {
   return (
@@ -20,8 +22,10 @@ export default function App() {
           
           <Route path="dashboard" element={<UserDashboardPage />} />
           <Route path="orders" element={<OrdersPage />} />
-          <Route path="wishlist" element={<WishlistPage />} /> */}
+           */}
+          <Route path="shop" element={<Products />} />
           <Route path="flash-deals" element={<FlashDeals />} />
+          <Route path="wishlist" element={<Wishlist />} />
           <Route path="cart" element={<ShoppingCart />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="login" element={<Login />} />
