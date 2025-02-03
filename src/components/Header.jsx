@@ -51,7 +51,7 @@ export default function Header() {
                 Featured
               </Link>
               <Link
-                href="/deals"
+                to="/flash-deals"
                 className="flex items-center gap-1 text-gray-700 hover:text-indigo-600"
               >
                 <Percent className="h-4 w-4" /> Deals
