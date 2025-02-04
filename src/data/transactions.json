@@ -1,0 +1,42 @@
+[
+  {
+    "id": "TRX-001",
+    "type": "income",
+    "description": "Order #1234",
+    "amount": 299.99,
+    "status": "completed",
+    "date": "2024-02-04 14:30"
+  },
+  {
+    "id": "TRX-002",
+    "type": "refund",
+    "description": "Refund Order #1230",
+    "amount": -150.0,
+    "status": "completed",
+    "date": "2024-02-04 12:25"
+  },
+  {
+    "id": "TRX-003",
+    "type": "income",
+    "description": "Order #1235",
+    "amount": 499.99,
+    "status": "pending",
+    "date": "2024-02-04 10:15"
+  },
+  {
+    "id": "TRX-004",
+    "type": "expense",
+    "description": "Supplier Payment for Inventory",
+    "amount": -300.0,
+    "status": "completed",
+    "date": "2024-02-03 16:45"
+  },
+  {
+    "id": "TRX-005",
+    "type": "income",
+    "description": "Order #1236",
+    "amount": 199.99,
+    "status": "failed",
+    "date": "2024-02-03 09:10"
+  }
+]

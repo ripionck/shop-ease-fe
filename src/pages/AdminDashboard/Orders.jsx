@@ -65,7 +65,7 @@ const stats = [
 
 export default function Orders({ onOpenModal }) {
   return (
-    <div className="p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Orders</h1>
         <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">

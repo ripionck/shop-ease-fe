@@ -1,0 +1,422 @@
+[
+  {
+    "id": 1,
+    "sku": "SKU001",
+    "category": "Electronics > Audio",
+    "name": "Wireless Earbuds Sport",
+    "price": 149.99,
+    "originalPrice": 199.99,
+    "discount": "25%",
+    "rating": 4.5,
+    "description": "Sweat-resistant wireless earbuds with 32hr total battery life. Perfect for athletes and active lifestyles.",
+    "features": [
+      "IPX7 Waterproof",
+      "Secure Sport Fit",
+      "Touch Controls",
+      "Active Noise Reduction"
+    ],
+    "specifications": {
+      "Driver Size": "10mm",
+      "Battery Life": "8hr (32hr with case)",
+      "Charging Time": "1.5hr",
+      "Bluetooth Version": "5.2"
+    },
+    "colors": ["black", "blue", "red"],
+    "images": [
+      "/products/sku001-1.jpg",
+      "/products/sku001-2.jpg",
+      "/products/sku001-3.jpg",
+      "/products/sku001-4.jpg"
+    ],
+    "stock": 25,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "Alex P.",
+        "rating": 5,
+        "date": "April 5, 2024",
+        "comment": "Survived my marathon training! Perfect fit and sound.",
+        "helpful": 28,
+        "notHelpful": 2
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "sku": "SKU002",
+    "category": "Electronics > Wearables",
+    "name": "Smartwatch Fitness Pro",
+    "price": 239.99,
+    "originalPrice": 299.99,
+    "discount": "20%",
+    "rating": 4.7,
+    "description": "Advanced health monitoring with 1.3\" AMOLED display and 7-day battery life.",
+    "features": [
+      "Blood Oxygen Monitor",
+      "100+ Sport Modes",
+      "GPS Tracking",
+      "Sleep Analysis"
+    ],
+    "specifications": {
+      "Screen Size": "1.3\"",
+      "Battery Life": "7 days",
+      "Water Resistance": "5ATM",
+      "Compatibility": "iOS/Android"
+    },
+    "colors": ["black", "silver"],
+    "images": [
+      "/products/sku002-1.jpg",
+      "/products/sku002-2.jpg",
+      "/products/sku002-3.jpg",
+      "/products/sku002-4.jpg"
+    ],
+    "stock": 18,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "Sarah L.",
+        "rating": 5,
+        "date": "March 28, 2024",
+        "comment": "Best fitness tracker I've owned!",
+        "helpful": 34,
+        "notHelpful": 1
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "sku": "SKU003",
+    "category": "Electronics > Audio",
+    "name": "Bluetooth Party Speaker",
+    "price": 179.99,
+    "originalPrice": 229.99,
+    "discount": "22%",
+    "rating": 4.3,
+    "description": "Portable 30W speaker with dynamic RGB lights and 24hr playtime.",
+    "features": [
+      "IPX5 Water Resistance",
+      "Party Light Show",
+      "TWS Pairing",
+      "Built-in Mic"
+    ],
+    "specifications": {
+      "Output Power": "30W",
+      "Battery Life": "24hr",
+      "Wireless Range": "33ft",
+      "Driver Size": "2.5\""
+    },
+    "colors": ["black", "blue"],
+    "images": [
+      "/products/sku003-1.jpg",
+      "/products/sku003-2.jpg",
+      "/products/sku003-3.jpg",
+      "/products/sku003-4.jpg"
+    ],
+    "stock": 42,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "Mike T.",
+        "rating": 4,
+        "date": "April 1, 2024",
+        "comment": "Great for backyard parties, lights are awesome!",
+        "helpful": 19,
+        "notHelpful": 3
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "sku": "SKU004",
+    "category": "Electronics > Cameras",
+    "name": "4K Action Camera",
+    "price": 299.99,
+    "originalPrice": 399.99,
+    "discount": "25%",
+    "rating": 4.6,
+    "description": "Waterproof adventure camera with 4K/60fps video and 5-axis stabilization.",
+    "features": [
+      "4K HDR Video",
+      "40m Waterproof",
+      "Touch Screen",
+      "Voice Control"
+    ],
+    "specifications": {
+      "Sensor": "1/2.3\" CMOS",
+      "Battery Life": "120min",
+      "Weight": "158g",
+      "Storage": "Supports 256GB"
+    },
+    "colors": ["black", "orange"],
+    "images": [
+      "/products/sku004-1.jpg",
+      "/products/sku004-2.jpg",
+      "/products/sku004-3.jpg",
+      "/products/sku004-4.jpg"
+    ],
+    "stock": 15,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "Emily R.",
+        "rating": 5,
+        "date": "March 29, 2024",
+        "comment": "Perfect for underwater shots during my dive trip!",
+        "helpful": 27,
+        "notHelpful": 0
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "sku": "SKU005",
+    "category": "Furniture > Office",
+    "name": "Ergonomic Office Chair",
+    "price": 249.99,
+    "originalPrice": 349.99,
+    "discount": "29%",
+    "rating": 4.4,
+    "description": "Premium mesh chair with lumbar support and adjustable armrests.",
+    "features": [
+      "Breathable Mesh",
+      "360° Swivel",
+      "Adjustable Height",
+      "125° Recline"
+    ],
+    "specifications": {
+      "Weight Capacity": "330lbs",
+      "Castors": "5-wheel",
+      "Assembly Time": "20min",
+      "Warranty": "5 years"
+    },
+    "colors": ["black", "gray"],
+    "images": [
+      "/products/sku005-1.jpg",
+      "/products/sku005-2.jpg",
+      "/products/sku005-3.jpg",
+      "/products/sku005-4.jpg"
+    ],
+    "stock": 32,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "David K.",
+        "rating": 4,
+        "date": "April 3, 2024",
+        "comment": "Game changer for my home office setup",
+        "helpful": 45,
+        "notHelpful": 5
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "sku": "SKU006",
+    "category": "Appliances > Kitchen",
+    "name": "Electric Air Fryer",
+    "price": 89.99,
+    "originalPrice": 129.99,
+    "discount": "31%",
+    "rating": 4.5,
+    "description": "6.5QT digital air fryer with 7 cooking presets and dishwasher-safe basket.",
+    "features": [
+      "Smart Temperature Control",
+      "Rapid Air Technology",
+      "Overheat Protection",
+      "Non-stick Coating"
+    ],
+    "specifications": {
+      "Capacity": "6.5QT",
+      "Power": "1700W",
+      "Temperature Range": "180-400°F",
+      "Dimensions": "14\" x 12\""
+    },
+    "colors": ["black", "white"],
+    "images": [
+      "/products/sku006-1.jpg",
+      "/products/sku006-2.jpg",
+      "/products/sku006-3.jpg",
+      "/products/sku006-4.jpg"
+    ],
+    "stock": 67,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "Linda M.",
+        "rating": 5,
+        "date": "March 25, 2024",
+        "comment": "Makes perfect crispy fries with 75% less oil!",
+        "helpful": 38,
+        "notHelpful": 2
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "sku": "SKU007",
+    "category": "Electronics > Audio",
+    "name": "Noise Cancelling Earbuds",
+    "price": 199.99,
+    "originalPrice": 259.99,
+    "discount": "23%",
+    "rating": 4.8,
+    "description": "True wireless earbuds with adaptive noise cancellation and spatial audio.",
+    "features": [
+      "ANC Technology",
+      "Wireless Charging",
+      "6-Mic Array",
+      "30hr Battery"
+    ],
+    "specifications": {
+      "Driver Size": "12mm",
+      "Bluetooth Version": "5.3",
+      "Water Resistance": "IPX4",
+      "Weight": "5.1g each"
+    },
+    "colors": ["white", "space gray"],
+    "images": [
+      "/products/sku007-1.jpg",
+      "/products/sku007-2.jpg",
+      "/products/sku007-3.jpg",
+      "/products/sku007-4.jpg"
+    ],
+    "stock": 28,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "Sophia C.",
+        "rating": 5,
+        "date": "April 2, 2024",
+        "comment": "Best noise cancellation I've experienced in earbuds!",
+        "helpful": 52,
+        "notHelpful": 1
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "sku": "SKU008",
+    "category": "Electronics > Computer Accessories",
+    "name": "Gaming Mechanical Keyboard",
+    "price": 129.99,
+    "originalPrice": 179.99,
+    "discount": "28%",
+    "rating": 4.6,
+    "description": "RGB-backlit keyboard with customizable macro keys and tactile switches.",
+    "features": [
+      "Cherry MX Switches",
+      "Per-Key RGB",
+      "Wrist Rest",
+      "N-Key Rollover"
+    ],
+    "specifications": {
+      "Switch Type": "Red/Brown/Blue",
+      "Polling Rate": "1000Hz",
+      "Backlight": "16.8M Colors",
+      "Connectivity": "USB-C"
+    },
+    "colors": ["black", "white"],
+    "images": [
+      "/products/sku008-1.jpg",
+      "/products/sku008-2.jpg",
+      "/products/sku008-3.jpg",
+      "/products/sku008-4.jpg"
+    ],
+    "stock": 39,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "Chris T.",
+        "rating": 5,
+        "date": "March 30, 2024",
+        "comment": "Responsive keys and amazing RGB customization!",
+        "helpful": 63,
+        "notHelpful": 4
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "sku": "SKU009",
+    "category": "Electronics > Smart Home",
+    "name": "Wireless Security Camera",
+    "price": 79.99,
+    "originalPrice": 119.99,
+    "discount": "33%",
+    "rating": 4.2,
+    "description": "2K outdoor camera with color night vision and AI motion detection.",
+    "features": [
+      "360° Coverage",
+      "2-Way Audio",
+      "Weatherproof",
+      "Cloud Storage"
+    ],
+    "specifications": {
+      "Resolution": "2K QHD",
+      "Field of View": "130°",
+      "Power Source": "Battery/Solar",
+      "Storage": "Local & Cloud"
+    },
+    "colors": ["white"],
+    "images": [
+      "/products/sku009-1.jpg",
+      "/products/sku009-2.jpg",
+      "/products/sku009-3.jpg",
+      "/products/sku009-4.jpg"
+    ],
+    "stock": 55,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "James P.",
+        "rating": 4,
+        "date": "April 4, 2024",
+        "comment": "Easy setup and clear night vision quality",
+        "helpful": 27,
+        "notHelpful": 3
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "sku": "SKU010",
+    "category": "Furniture > Office",
+    "name": "Electric Standing Desk",
+    "price": 399.99,
+    "originalPrice": 549.99,
+    "discount": "27%",
+    "rating": 4.7,
+    "description": "Height-adjustable desk with programmable memory settings and anti-collision.",
+    "features": [
+      "Dual Motor Lift",
+      "4 Memory Presets",
+      "Cable Management",
+      "Eco-Friendly Surface"
+    ],
+    "specifications": {
+      "Height Range": "28\"-48\"",
+      "Weight Capacity": "275lbs",
+      "Desktop Size": "60\"x30\"",
+      "Warranty": "10 years"
+    },
+    "colors": ["walnut", "black"],
+    "images": [
+      "/products/sku010-1.jpg",
+      "/products/sku010-2.jpg",
+      "/products/sku010-3.jpg",
+      "/products/sku010-4.jpg"
+    ],
+    "stock": 12,
+    "reviews": [
+      {
+        "id": 1,
+        "user": "Olivia W.",
+        "rating": 5,
+        "date": "March 27, 2024",
+        "comment": "Life-changing for my back pain! Super quiet motor.",
+        "helpful": 89,
+        "notHelpful": 2
+      }
+    ]
+  }
+]

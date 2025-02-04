@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Dashboard from './Dashboard';
 import Orders from './Orders';
-import Wishlist from '../Wishlist';
+import Wishlist from './Wishlist';
 import Profile from './Profile';
 import Settings from './Settings';
 import Sidebar from './Sidebar';
@@ -10,8 +10,7 @@ import Sidebar from './Sidebar';
 const userData = {
   name: 'John Doe',
   email: 'john.doe@example.com',
-  avatar:
-    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-02%20021454-bkUgDoLjzbZ4DybRGJvJ6yy67ZgdPs.png',
+  avatar: 'https://avatar.iran.liara.run/public',
   stats: {
     totalOrders: 12,
     wishlistItems: 8,

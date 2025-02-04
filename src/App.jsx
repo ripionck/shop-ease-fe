@@ -8,7 +8,6 @@ import ShoppingCart from './pages/ShoppingCart';
 import Checkout from './pages/Checkout';
 import FlashDeals from './pages/FlashDeals';
 import Products from './pages/Products';
-import Wishlist from './pages/Wishlist';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import UserDashboard from './pages/UserDashboard/UserDashboard';
 import ProductDetail from './pages/ProductDetail';
@@ -22,7 +21,6 @@ export default function App() {
           <Route path="shop" element={<Products />} />
           <Route path="product/:id" element={<ProductDetail />} />
           <Route path="flash-deals" element={<FlashDeals />} />
-          <Route path="wishlist" element={<Wishlist />} />
           <Route path="cart" element={<ShoppingCart />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="login" element={<Login />} />

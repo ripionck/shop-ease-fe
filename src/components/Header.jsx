@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   Search,
   ShoppingCart,
-  Heart,
   User,
   X,
   House,
@@ -67,18 +66,6 @@ export default function Header() {
               >
                 <Search className="w-6 h-6" />
               </button>
-
-              <Link
-                to="/wishlist"
-                className="text-gray-700 hover:text-indigo-600"
-              >
-                <div className="relative">
-                  <Heart className="w-6 h-6" />
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">
-                    2
-                  </span>
-                </div>
-              </Link>
 
               <Link to="/cart" className="text-gray-700 hover:text-indigo-600">
                 <div className="relative">

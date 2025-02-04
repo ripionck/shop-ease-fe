@@ -9,6 +9,18 @@ import AddCategoryModal from './AddCategoryModal';
 import AddProductModal from './AddProductModal';
 import Analytics from './Analytics';
 import Transactions from './Transactions';
+import Categories from './Categories';
+
+const userData = {
+  name: 'John Doe',
+  email: 'john.doe@example.com',
+  avatar: 'https://avatar.iran.liara.run/public',
+  stats: {
+    totalOrders: 12,
+    wishlistItems: 8,
+    totalSpent: 2890,
+  },
+};
 
 export default function AdminDashboard() {
   const [currentPage, setCurrentPage] = useState('analytics');
@@ -31,6 +43,8 @@ export default function AdminDashboard() {
         return <Analytics />;
       case 'products':
         return <Products onOpenModal={openModal} />;
+      case 'categories':
+        return <Categories onOpenModal={openModal} />;
       case 'inventory':
         return <Inventory onOpenModal={openModal} />;
       case 'orders':
@@ -44,7 +58,11 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+      <Sidebar
+        user={userData}
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+      />
       <main className="flex-1 p-8">{renderPage()}</main>
 
       {/* Modals */}

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "name": "Wireless Headphones Pro",
+    "color": "Black",
+    "price": 299.99,
+    "image": "https://i.imgur.com/abc1234.jpg",
+    "quantity": 1
+  },
+  {
+    "id": "2",
+    "name": "Premium Laptop",
+    "color": "Silver",
+    "price": 1299.99,
+    "image": "https://i.imgur.com/def5678.jpg",
+    "quantity": 1
+  },
+  {
+    "id": "3",
+    "name": "Smartphone X",
+    "color": "Blue",
+    "price": 799.99,
+    "image": "https://i.imgur.com/ghi9012.jpg",
+    "quantity": 1
+  },
+  {
+    "id": "4",
+    "name": "Gaming Mouse",
+    "color": "Red",
+    "price": 49.99,
+    "image": "https://i.imgur.com/jkl3456.jpg",
+    "quantity": 1
+  },
+  {
+    "id": "5",
+    "name": "4K Ultra HD Monitor",
+    "color": "Black",
+    "price": 399.99,
+    "image": "https://i.imgur.com/mno7890.jpg",
+    "quantity": 1
+  }
+]
