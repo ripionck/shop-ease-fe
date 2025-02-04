@@ -89,10 +89,10 @@ export default function Header() {
                 </div>
               </Link>
 
-              <Link
-                to="/profile"
-                className="text-gray-700 hover:text-indigo-600"
-              >
+              <Link to="/admin" className="text-gray-700 hover:text-indigo-600">
+                <User className="w-6 h-6" />
+              </Link>
+              <Link to="/user" className="text-gray-700 hover:text-indigo-600">
                 <User className="w-6 h-6" />
               </Link>
             </div>

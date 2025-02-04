@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   Star,
 } from 'lucide-react';
+import allproducts from '../data/products';
 
 // Dummy data for categories
 const categories = [
@@ -19,18 +20,18 @@ const categories = [
 ];
 
 // Dummy data for products
-const allProducts = Array(20)
-  .fill(null)
-  .map((_, i) => ({
-    id: i + 1,
-    name: `Product ${i + 1}`,
-    description: 'Lorem ipsum dolor sit amet',
-    price: Math.floor(Math.random() * 1000) + 99.99,
-    rating: Math.floor(Math.random() * 5) + 1,
-    reviews: Math.floor(Math.random() * 500) + 1,
-    image: '/placeholder.svg',
-    category: categories[Math.floor(Math.random() * categories.length)].name,
-  }));
+// const allProducts = Array(20)
+//   .fill(null)
+//   .map((_, i) => ({
+//     id: i + 1,
+//     name: `Product ${i + 1}`,
+//     description: 'Lorem ipsum dolor sit amet',
+//     price: Math.floor(Math.random() * 1000) + 99.99,
+//     rating: Math.floor(Math.random() * 5) + 1,
+//     reviews: Math.floor(Math.random() * 500) + 1,
+//     image: '/placeholder.svg',
+//     category: categories[Math.floor(Math.random() * categories.length)].name,
+//   }));
 
 const StarRating = ({ rating, reviews }) => {
   return (
@@ -55,10 +56,10 @@ export default function Products() {
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('featured');
-  const [products, setProducts] = useState(allProducts);
+  const [products, setProducts] = useState(allproducts);
 
   useEffect(() => {
-    let filteredProducts = allProducts;
+    let filteredProducts = products;
 
     // Apply search filter
     if (searchTerm) {
@@ -273,7 +274,7 @@ export default function Products() {
                 <option value="rating">Highest Rated</option>
               </select>
               <span className="text-gray-600">
-                Showing {products.length} of {allProducts.length} products
+                Showing {products.length} of {products.length} products
               </span>
             </div>
             <div className="flex gap-2">

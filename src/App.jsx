@@ -9,7 +9,9 @@ import Checkout from './pages/Checkout';
 import FlashDeals from './pages/FlashDeals';
 import Products from './pages/Products';
 import Wishlist from './pages/Wishlist';
-import UserDashboard from './pages/UserDashboard';
+import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
+import UserDashboard from './pages/UserDashboard/UserDashboard';
+import ProductDetail from './pages/ProductDetail';
 
 export default function App() {
   return (
@@ -17,28 +19,17 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          {/* <Route path="shop" element={<ProductListingPage />} />
-          <Route path="product/:id" element={<ProductDetailPage />} />
-          <Route path="orders" element={<OrdersPage />} />
-           */}
           <Route path="shop" element={<Products />} />
+          <Route path="product/:id" element={<ProductDetail />} />
           <Route path="flash-deals" element={<FlashDeals />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="cart" element={<ShoppingCart />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-          <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="user" element={<UserDashboard />} />
+          <Route path="admin" element={<AdminDashboard />} />
         </Route>
-        {/* <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="products/add" element={<AdminAddProduct />} />
-          <Route path="categories" element={<AdminCategories />} />
-          <Route path="categories/add" element={<AdminAddCategory />} />
-          <Route path="inventory" element={<AdminInventory />} />
-          <Route path="inventory/update/:id" element={<AdminUpdateStock />} />
-        </Route> */}
       </Routes>
     </Router>
   );
