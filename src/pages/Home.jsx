@@ -1,13 +1,13 @@
 import CategorySection from '../components/CategorySection';
-import FeaturedProducts from '../components/FeaturedProducts';
 import HeroSection from '../components/HeroSection';
+import SpecialOffers from '../components/SpecialOffers';
 
 export default function Home() {
   return (
     <div>
       <HeroSection />
-      <FeaturedProducts />
       <CategorySection />
+      <SpecialOffers />
     </div>
   );
 }

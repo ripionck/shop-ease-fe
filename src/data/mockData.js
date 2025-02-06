@@ -27,18 +27,6 @@ export const orders = [
   },
 ];
 
-// export const products = [
-//   {
-//     id: 'SKU001',
-//     name: 'Wireless Headphones',
-//     category: 'Electronics',
-//     price: 99.99,
-//     stock: 145,
-//     image:
-//       'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-02%20170254-K0pJF0BpMY7n2ERCNHubQ6YKxt5ybE.png',
-//   },
-// ];
-
 export const inventory = [
   {
     sku: 'SKU001',
@@ -83,33 +71,3 @@ export const inventoryStats = {
   lowStock: 28,
   outOfStock: 12,
 };
-
-export const transactions = [
-  {
-    id: 'TRX-001',
-    type: 'Sale',
-    amount: 299.99,
-    status: 'Completed',
-    customer: 'John Doe',
-    date: '2024-02-20',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    id: 'TRX-002',
-    type: 'Refund',
-    amount: -149.99,
-    status: 'Completed',
-    customer: 'Jane Smith',
-    date: '2024-02-19',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    id: 'TRX-003',
-    type: 'Sale',
-    amount: 599.99,
-    status: 'Pending',
-    customer: 'Mike Johnson',
-    date: '2024-02-18',
-    paymentMethod: 'PayPal',
-  },
-];

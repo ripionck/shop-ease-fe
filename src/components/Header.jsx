@@ -43,7 +43,7 @@ export default function Header() {
                 Shop
               </Link>
               <Link
-                href="/featured"
+                to="/featured"
                 className="flex items-center gap-1 text-gray-700 hover:text-indigo-600"
               >
                 <Star className="h-4 w-4" />
