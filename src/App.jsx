@@ -1,17 +1,17 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Home from './pages/Home';
 import Layout from './components/Layout';
-import ShoppingCart from './pages/ShoppingCart';
-import Checkout from './pages/Checkout';
-import FlashDeals from './pages/FlashDeals';
-import Products from './pages/Products';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
-import UserDashboard from './pages/UserDashboard/UserDashboard';
-import ProductDetail from './pages/ProductDetail';
+import Checkout from './pages/Checkout';
 import Featured from './pages/Featured';
+import FlashDeals from './pages/FlashDeals';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import ProductDetail from './pages/ProductDetail';
+import Products from './pages/Products';
+import Register from './pages/Register';
+import ShoppingCart from './pages/ShoppingCart';
+import UserDashboard from './pages/UserDashboard/UserDashboard';
 
 export default function App() {
   return (
@@ -27,8 +27,8 @@ export default function App() {
           <Route path="checkout" element={<Checkout />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-          <Route path="user" element={<UserDashboard />} />
-          <Route path="admin" element={<AdminDashboard />} />
+          <Route path="user-dashboard" element={<UserDashboard />} />
+          <Route path="admin-dashboard" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </Router>

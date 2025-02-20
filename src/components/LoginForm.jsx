@@ -1,5 +1,7 @@
+import axios from 'axios';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({
@@ -7,6 +9,10 @@ export default function LoginForm() {
     password: '',
     rememberMe: false,
   });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value, checked } = e.target;
@@ -16,10 +22,30 @@ export default function LoginForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login submitted:', formData);
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/login/', {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      const { access, refresh } = response.data;
+      login({ access, refresh }, formData.rememberMe);
+      navigate('/');
+    } catch (err) {
+      let errorMessage = 'An unexpected error occurred. Please try again.';
+      if (err.response) {
+        errorMessage =
+          err.response.data.detail || err.response.data.message || errorMessage;
+      }
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -31,7 +57,7 @@ export default function LoginForm() {
             Sign in to your account to continue shopping
           </p>
         </div>
-
+        {error && <p className="text-red-500 text-center">{error}</p>}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
@@ -53,7 +79,6 @@ export default function LoginForm() {
                 placeholder="Enter your email"
               />
             </div>
-
             <div>
               <label
                 htmlFor="password"
@@ -73,7 +98,6 @@ export default function LoginForm() {
                 placeholder="Enter your password"
               />
             </div>
-
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
@@ -91,10 +115,9 @@ export default function LoginForm() {
                   Remember me
                 </label>
               </div>
-
               <div className="text-sm">
                 <Link
-                  // to="/forgot-password"
+                  to="/forgot-password"
                   className="font-medium text-indigo-600 hover:text-indigo-500"
                 >
                   Forgot password?
@@ -102,14 +125,17 @@ export default function LoginForm() {
               </div>
             </div>
           </div>
-
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={isLoading}
+            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white ${
+              isLoading
+                ? 'bg-indigo-400 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-700'
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
           >
-            Sign in
+            {isLoading ? 'Signing in...' : 'Sign in'}
           </button>
-
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300" />
@@ -120,7 +146,6 @@ export default function LoginForm() {
               </span>
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -147,12 +172,11 @@ export default function LoginForm() {
               <span className="ml-2">Facebook</span>
             </button>
           </div>
-
           <p className="mt-2 text-center text-sm text-gray-600">
             Don&apos;t have an account?
             <Link
               to="/register"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+              className="font-medium text-indigo-600 hover:text-indigo-500 ml-1"
             >
               Sign up
             </Link>
