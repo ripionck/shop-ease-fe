@@ -1,10 +1,9 @@
 import {
-  LayoutDashboard,
-  ShoppingBag,
   Heart,
-  User,
+  LayoutDashboard,
   SettingsIcon,
-  LogOut,
+  ShoppingBag,
+  User,
 } from 'lucide-react';
 
 export default function Sidebar({ user, currentPage, onNavigate }) {
@@ -50,14 +49,6 @@ export default function Sidebar({ user, currentPage, onNavigate }) {
             </button>
           );
         })}
-
-        <button
-          onClick={() => console.log('Logout clicked')}
-          className="flex items-center w-full px-4 py-3 text-sm text-red-600 rounded-lg hover:bg-red-50"
-        >
-          <LogOut className="w-5 h-5 mr-3" />
-          Logout
-        </button>
       </nav>
     </aside>
   );

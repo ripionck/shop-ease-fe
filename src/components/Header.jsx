@@ -16,11 +16,11 @@ import SearchModal from './SearchModal';
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { isLoggedIn, userProfile, logout } = useAuth();
+  const { auth, login, logout } = useAuth();
   const navigate = useNavigate();
 
   const dashboardPath =
-    userProfile?.role === 'admin' ? '/admin-dashboard' : '/user-dashboard';
+    auth?.user?.role === 'admin' ? '/admin-dashboard' : '/user-dashboard';
 
   return (
     <>
@@ -70,7 +70,7 @@ export default function Header() {
                 <Search className="w-6 h-6" />
               </button>
 
-              {isLoggedIn && (
+              {login && (
                 <Link
                   to="/cart"
                   className="text-gray-700 hover:text-indigo-600"
@@ -84,15 +84,15 @@ export default function Header() {
                 </Link>
               )}
 
-              {isLoggedIn ? (
+              {login ? (
                 <div className="relative">
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className="text-gray-700 hover:text-indigo-600 relative"
                   >
-                    {userProfile?.image ? (
+                    {auth?.image ? (
                       <img
-                        src={userProfile.image}
+                        src={auth.image}
                         alt="Profile"
                         className="w-8 h-8 rounded-full object-cover"
                       />

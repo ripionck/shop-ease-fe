@@ -4,24 +4,23 @@ import { useEffect, useState } from 'react';
 import AuthContext from './AuthContext';
 
 const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userProfile, setUserProfile] = useState(null);
+  const [auth, setAuth] = useState({
+    user: null,
+    accessToken: null,
+    isLoggedIn: false,
+  });
 
-  const checkAuthStatus = () => {
-    const accessToken =
+  const getAccessToken = () => {
+    return (
       localStorage.getItem('access_token') ||
-      sessionStorage.getItem('access_token');
-    const refreshToken =
-      localStorage.getItem('refresh_token') ||
-      sessionStorage.getItem('refresh_token');
-    return !!accessToken && !!refreshToken;
+      sessionStorage.getItem('access_token')
+    );
   };
 
   const fetchUserProfile = async () => {
     try {
-      const accessToken =
-        localStorage.getItem('access_token') ||
-        sessionStorage.getItem('access_token');
+      const accessToken = getAccessToken();
+      if (!accessToken) return;
 
       const response = await axios.get(
         'http://127.0.0.1:8000/api/v1/profile/',
@@ -29,21 +28,30 @@ const AuthProvider = ({ children }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         },
       );
-      setUserProfile(response.data);
+
+      setAuth((prev) => ({
+        ...prev,
+        user: response.data,
+        accessToken: accessToken,
+        isLoggedIn: true,
+      }));
     } catch (error) {
       console.error('Error fetching profile:', error);
+      logout();
     }
   };
 
   const login = (tokens, rememberMe) => {
-    if (rememberMe) {
-      localStorage.setItem('access_token', tokens.access);
-      localStorage.setItem('refresh_token', tokens.refresh);
-    } else {
-      sessionStorage.setItem('access_token', tokens.access);
-      sessionStorage.setItem('refresh_token', tokens.refresh);
-    }
-    setIsLoggedIn(true);
+    const storage = rememberMe ? localStorage : sessionStorage;
+    storage.setItem('access_token', tokens.access);
+    storage.setItem('refresh_token', tokens.refresh);
+
+    setAuth((prev) => ({
+      ...prev,
+      accessToken: tokens.access,
+      isLoggedIn: true,
+    }));
+
     fetchUserProfile();
   };
 
@@ -52,18 +60,20 @@ const AuthProvider = ({ children }) => {
       localStorage.removeItem(token);
       sessionStorage.removeItem(token);
     });
-    setIsLoggedIn(false);
-    setUserProfile(null);
+    setAuth({
+      user: null,
+      accessToken: null,
+      isLoggedIn: false,
+    });
   };
 
   useEffect(() => {
-    const loggedIn = checkAuthStatus();
-    setIsLoggedIn(loggedIn);
-    if (loggedIn) fetchUserProfile();
+    const accessToken = getAccessToken();
+    if (accessToken) fetchUserProfile();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userProfile, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
