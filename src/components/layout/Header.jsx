@@ -10,8 +10,8 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
-import SearchModal from './SearchModal';
+import useAuth from '../../hooks/useAuth';
+import SearchModal from '../SearchModal';
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);

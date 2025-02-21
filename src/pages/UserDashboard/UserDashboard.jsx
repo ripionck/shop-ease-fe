@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import Dashboard from './Dashboard';
+import History from './History';
 import Orders from './Orders';
-import Wishlist from './Wishlist';
 import Profile from './Profile';
 import Settings from './Settings';
 import Sidebar from './Sidebar';
+import Wishlist from './Wishlist';
 
 // Dummy user data
 const userData = {
@@ -19,12 +19,12 @@ const userData = {
 };
 
 export default function UserDashboard() {
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState('history');
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'dashboard':
-        return <Dashboard user={userData} />;
+      case 'history':
+        return <History user={userData} />;
       case 'orders':
         return <Orders />;
       case 'wishlist':
@@ -34,7 +34,7 @@ export default function UserDashboard() {
       case 'settings':
         return <Settings />;
       default:
-        return <Dashboard user={userData} />;
+        return <History user={userData} />;
     }
   };
 

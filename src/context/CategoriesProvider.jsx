@@ -1,6 +1,6 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import CategoriesContext from './CategoriesContext';
 
@@ -10,48 +10,75 @@ export const CategoriesProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { auth } = useAuth();
 
-  const api = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/v1/',
-    headers: {
-      Authorization: `Bearer ${auth.accessToken}`,
-    },
-  });
+  // Memoized axios instances
+  const api = useMemo(
+    () =>
+      axios.create({
+        baseURL: 'http://127.0.0.1:8000/api/v1/',
+        headers: {
+          Authorization: `Bearer ${auth.accessToken}`,
+        },
+      }),
+    [auth.accessToken],
+  );
+
+  const publicApi = useMemo(
+    () =>
+      axios.create({
+        baseURL: 'http://127.0.0.1:8000/api/v1/',
+      }),
+    [],
+  );
+
+  // Optional: Fetch categories on initial load
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleError = (err, defaultMessage) => {
+    setError(err.response?.data?.message || err.message || defaultMessage);
+  };
+
+  const verifyAdmin = () => {
+    if (auth.user?.role !== 'admin') {
+      setError('Only admin users can perform this action');
+      return false;
+    }
+    return true;
+  };
 
   const fetchCategories = async () => {
+    setError(null);
     setLoading(true);
     try {
-      const response = await api.get('categories/');
-      setCategories(response.data.results || []);
+      const response = await publicApi.get('categories/');
+      setCategories(response.data.categories || []);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch categories');
+      handleError(err, 'Failed to fetch categories');
     } finally {
       setLoading(false);
     }
   };
 
   const createCategory = async (categoryData) => {
-    if (auth.user?.role !== 'admin') {
-      setError('Only admin users can create categories');
-      return;
-    }
+    if (!verifyAdmin()) return;
 
+    setError(null);
     setLoading(true);
     try {
       const response = await api.post('categories/', categoryData);
       setCategories((prev) => [...prev, response.data]);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create category');
+      handleError(err, 'Failed to create category');
     } finally {
       setLoading(false);
     }
   };
 
   const updateCategory = async (id, categoryData) => {
-    if (auth.user?.role !== 'admin') {
-      setError('Only admin users can update categories');
-      return;
-    }
+    if (!verifyAdmin()) return;
 
+    setError(null);
     setLoading(true);
     try {
       const response = await api.put(`categories/${id}/`, categoryData);
@@ -59,24 +86,22 @@ export const CategoriesProvider = ({ children }) => {
         prev.map((category) => (category.id === id ? response.data : category)),
       );
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update category');
+      handleError(err, 'Failed to update category');
     } finally {
       setLoading(false);
     }
   };
 
   const deleteCategory = async (id) => {
-    if (auth.user?.role !== 'admin') {
-      setError('Only admin users can delete categories');
-      return;
-    }
+    if (!verifyAdmin()) return;
 
+    setError(null);
     setLoading(true);
     try {
       await api.delete(`categories/${id}/`);
       setCategories((prev) => prev.filter((category) => category.id !== id));
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete category');
+      handleError(err, 'Failed to delete category');
     } finally {
       setLoading(false);
     }

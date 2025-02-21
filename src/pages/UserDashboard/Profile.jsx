@@ -1,6 +1,6 @@
-import { Pencil, Trash, CreditCard } from 'lucide-react';
+import { CreditCard, Pencil, Trash } from 'lucide-react';
 import { useState } from 'react';
-import AddAddressModal from '../UserDashboard/AddAddressModal/';
+import AddAddressModal from './AddAddressModal';
 
 export default function Profile() {
   const [personalInfo, setPersonalInfo] = useState({

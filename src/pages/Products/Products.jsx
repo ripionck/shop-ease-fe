@@ -1,36 +1,17 @@
-import { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
-  Search,
-  ChevronRight,
   ChevronLeft,
+  ChevronRight,
   Grid,
-  List,
   Heart,
+  List,
+  Search,
   ShoppingCart,
   Star,
 } from 'lucide-react';
-
-// Dummy data for categories
-const categories = [
-  { name: 'Electronics', count: 45 },
-  { name: 'Fashion', count: 32 },
-  { name: 'Home & Living', count: 28 },
-  { name: 'Beauty', count: 15 },
-];
-
-// Dummy data for products
-const allProducts = Array(20)
-  .fill(null)
-  .map((_, i) => ({
-    id: i + 1,
-    name: `Product ${i + 1}`,
-    description: 'Lorem ipsum dolor sit amet',
-    price: Math.floor(Math.random() * 1000) + 99.99,
-    rating: Math.floor(Math.random() * 5) + 1,
-    reviews: Math.floor(Math.random() * 500) + 1,
-    image: '/placeholder.svg',
-    category: categories[Math.floor(Math.random() * categories.length)].name,
-  }));
+import { useEffect, useState } from 'react';
+import Spinner from '../../components/Spinner';
+import useAuth from '../../hooks/useAuth'; // Assuming you have an auth hook
 
 const StarRating = ({ rating, reviews }) => {
   return (
@@ -55,58 +36,79 @@ export default function Products() {
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('featured');
-  const [products, setProducts] = useState(allProducts);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 9;
 
+  const { auth } = useAuth(); // Get authentication details
+
+  // Fetch products and categories on component mount
   useEffect(() => {
-    let filteredProducts = products;
+    const fetchData = async () => {
+      try {
+        const [productsResponse, categoriesResponse] = await Promise.all([
+          axios.get('http://127.0.0.1:8000/api/v1/products/'),
+          axios.get('http://127.0.0.1:8000/api/v1/categories/'),
+        ]);
 
-    // Apply search filter
-    if (searchTerm) {
-      filteredProducts = filteredProducts.filter(
-        (product) =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
+        setProducts(productsResponse.data.products);
+        setCategories(categoriesResponse.data.categories);
+      } catch (error) {
+        setError(error.message);
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter and sort products
+  const filteredProducts = products
+    .filter((product) => {
+      const matchesSearch = product.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(product.category);
+      const matchesRating =
+        selectedRatings.length === 0 ||
+        selectedRatings.includes(Math.floor(product.rating));
+      const matchesPrice =
+        product.price >= priceRange[0] && product.price <= priceRange[1];
+      return matchesSearch && matchesCategory && matchesRating && matchesPrice;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low-high':
+          return a.price - b.price;
+        case 'price-high-low':
+          return b.price - a.price;
+        case 'rating':
+          return b.rating - a.rating;
+        default:
+          return 0; // 'featured' - no sorting
+      }
+    });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const paginatedProducts = filteredProducts.slice(
+    startIndex,
+    startIndex + productsPerPage,
+  );
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
     }
-
-    // Apply category filter
-    if (selectedCategories.length > 0) {
-      filteredProducts = filteredProducts.filter((product) =>
-        selectedCategories.includes(product.category),
-      );
-    }
-
-    // Apply rating filter
-    if (selectedRatings.length > 0) {
-      filteredProducts = filteredProducts.filter((product) =>
-        selectedRatings.includes(Math.floor(product.rating)),
-      );
-    }
-
-    // Apply price range filter
-    filteredProducts = filteredProducts.filter(
-      (product) =>
-        product.price >= priceRange[0] && product.price <= priceRange[1],
-    );
-
-    // Apply sorting
-    switch (sortBy) {
-      case 'price-low-high':
-        filteredProducts.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high-low':
-        filteredProducts.sort((a, b) => b.price - a.price);
-        break;
-      case 'rating':
-        filteredProducts.sort((a, b) => b.rating - a.rating);
-        break;
-      default:
-        // 'featured' - no sorting needed
-        break;
-    }
-
-    setProducts(filteredProducts);
-  }, [searchTerm, selectedCategories, selectedRatings, priceRange, sortBy]);
+  };
 
   const handleCategoryChange = (category) => {
     setSelectedCategories((prev) =>
@@ -114,6 +116,7 @@ export default function Products() {
         ? prev.filter((c) => c !== category)
         : [...prev, category],
     );
+    setCurrentPage(1); // Reset to the first page when filters change
   };
 
   const handleRatingChange = (rating) => {
@@ -122,7 +125,66 @@ export default function Products() {
         ? prev.filter((r) => r !== rating)
         : [...prev, rating],
     );
+    setCurrentPage(1); // Reset to the first page when filters change
   };
+
+  // Add to Cart
+  const handleAddToCart = async (productId) => {
+    if (!auth.accessToken) {
+      alert('Please log in to add items to your cart.');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'http://127.0.0.1:8000/api/v1/cart/',
+        { product_id: productId },
+        {
+          headers: {
+            Authorization: `Bearer ${auth.accessToken}`,
+          },
+        },
+      );
+      alert('Product added to cart successfully!');
+      console.log('Cart Response:', response.data);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('Failed to add product to cart.');
+    }
+  };
+
+  // Add to Wishlist
+  const handleAddToWishlist = async (productId) => {
+    if (!auth.accessToken) {
+      alert('Please log in to add items to your wishlist.');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'http://127.0.0.1:8000/api/v1/wishlist/',
+        { product_id: productId },
+        {
+          headers: {
+            Authorization: `Bearer ${auth.accessToken}`,
+          },
+        },
+      );
+      alert('Product added to wishlist successfully!');
+      console.log('Wishlist Response:', response.data);
+    } catch (error) {
+      console.error('Error adding to wishlist:', error);
+      alert('Failed to add product to wishlist.');
+    }
+  };
+
+  if (loading) {
+    return <Spinner />;
+  }
+
+  if (error) {
+    return <div className="text-center py-8 text-red-600">Error: {error}</div>;
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -162,7 +224,7 @@ export default function Products() {
             <h3 className="font-medium mb-4">Categories</h3>
             <div className="space-y-2">
               {categories.map((category) => (
-                <label key={category.name} className="flex items-center">
+                <label key={category.id} className="flex items-center">
                   <input
                     type="checkbox"
                     checked={selectedCategories.includes(category.name)}
@@ -171,7 +233,7 @@ export default function Products() {
                   />
                   <span className="ml-2 text-gray-600">{category.name}</span>
                   <span className="ml-auto text-gray-400">
-                    ({category.count})
+                    ({category.products_count || 0})
                   </span>
                 </label>
               ))}
@@ -250,6 +312,7 @@ export default function Products() {
               setSelectedCategories([]);
               setSelectedRatings([]);
               setPriceRange([0, 2000]);
+              setCurrentPage(1); // Reset to the first page when clearing filters
             }}
             className="w-full py-2 text-gray-600 border rounded-lg hover:bg-gray-50"
           >
@@ -273,7 +336,7 @@ export default function Products() {
                 <option value="rating">Highest Rated</option>
               </select>
               <span className="text-gray-600">
-                Showing {products.length} of {products.length} products
+                Showing {filteredProducts.length} of {products.length} products
               </span>
             </div>
             <div className="flex gap-2">
@@ -304,63 +367,88 @@ export default function Products() {
                 : 'space-y-6'
             }
           >
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className={`bg-white rounded-lg shadow-md overflow-hidden ${
-                  viewMode === 'list' ? 'flex' : ''
-                }`}
-              >
+            {paginatedProducts.length === 0 ? (
+              <div className="text-center py-8 text-gray-600">
+                No products found matching your criteria.
+              </div>
+            ) : (
+              paginatedProducts.map((product) => (
                 <div
-                  className={`relative ${viewMode === 'list' ? 'w-1/3' : ''}`}
+                  key={product.id}
+                  className={`bg-white rounded-lg shadow-md overflow-hidden ${
+                    viewMode === 'list' ? 'flex' : ''
+                  }`}
                 >
-                  <img
-                    src={product.image || '/placeholder.svg'}
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <button className="absolute top-3 right-3 p-1.5 rounded-full bg-white/80 hover:bg-white">
-                    <Heart className="w-5 h-5 text-gray-600" />
-                  </button>
-                </div>
-                <div className={`p-4 ${viewMode === 'list' ? 'w-2/3' : ''}`}>
-                  <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                  <p className="text-gray-600 text-sm mb-2">
-                    {product.description}
-                  </p>
-                  <StarRating
-                    rating={product.rating}
-                    reviews={product.reviews}
-                  />
-                  <div className="flex items-center justify-between mt-4">
-                    <span className="text-lg font-bold text-indigo-600">
-                      ${product.price.toFixed(2)}
-                    </span>
-                    <button className="p-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700">
-                      <ShoppingCart className="w-5 h-5" />
+                  <div
+                    className={`relative ${viewMode === 'list' ? 'w-1/3' : ''}`}
+                  >
+                    <img
+                      src={product.image || '/placeholder.svg'}
+                      alt={product.name}
+                      className="w-full h-48 object-cover"
+                    />
+                    <button
+                      onClick={() => handleAddToWishlist(product.id)}
+                      className="absolute top-3 right-3 p-1.5 rounded-full bg-white/80 hover:bg-white"
+                    >
+                      <Heart className="w-5 h-5 text-gray-600" />
                     </button>
                   </div>
+                  <div className={`p-4 ${viewMode === 'list' ? 'w-2/3' : ''}`}>
+                    <h3 className="font-semibold text-lg mb-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-2">
+                      {product.description}
+                    </p>
+                    <StarRating
+                      rating={product.rating}
+                      reviews={product.reviews}
+                    />
+                    <div className="flex items-center justify-between mt-4">
+                      <span className="text-lg font-bold text-indigo-600">
+                        ${product.price}
+                      </span>
+                      <button
+                        onClick={() => handleAddToCart(product.id)}
+                        className="p-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Pagination */}
           <div className="flex items-center justify-center gap-2 mt-8">
-            <button className="p-2 rounded-lg border hover:bg-gray-50">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
+            >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            {[1, 2, 3, '...', 12].map((page, i) => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
-                key={i}
+                key={page}
+                onClick={() => handlePageChange(page)}
                 className={`px-4 py-2 rounded-lg ${
-                  page === 1 ? 'bg-indigo-600 text-white' : 'hover:bg-gray-50'
+                  page === currentPage
+                    ? 'bg-indigo-600 text-white'
+                    : 'hover:bg-gray-50'
                 }`}
               >
                 {page}
               </button>
             ))}
-            <button className="p-2 rounded-lg border hover:bg-gray-50">
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
+            >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>

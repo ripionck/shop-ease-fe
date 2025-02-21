@@ -1,64 +1,14 @@
-import { useState } from 'react';
+// RegisterForm.jsx
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-export default function RegisterForm() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/v1/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Handle API errors
-        setError(data.message || 'An error occurred during registration.');
-      } else {
-        // Registration successful
-        setSuccess(true);
-        setError('');
-        console.log('Registration successful:', data);
-      }
-    } catch (err) {
-      // Handle network or other errors
-      setError('An unexpected error occurred. Please try again.');
-      console.error(err);
-    }
-  };
-
+function RegisterForm({
+  formData,
+  error,
+  success,
+  handleInputChange,
+  handleSubmit,
+}) {
   return (
     <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-sm">
       <div className="text-center">
@@ -155,7 +105,7 @@ export default function RegisterForm() {
           Sign up
         </button>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Already have an account?
+          Already have an account?{' '}
           <Link
             to="/login"
             className="font-medium text-indigo-600 hover:text-indigo-500"
@@ -167,3 +117,18 @@ export default function RegisterForm() {
     </div>
   );
 }
+
+RegisterForm.propTypes = {
+  formData: PropTypes.shape({
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    password: PropTypes.string.isRequired,
+    confirmPassword: PropTypes.string.isRequired,
+  }).isRequired,
+  error: PropTypes.string,
+  success: PropTypes.bool,
+  handleInputChange: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+};
+
+export default RegisterForm;

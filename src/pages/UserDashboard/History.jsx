@@ -1,4 +1,4 @@
-import { Lock, Heart, CreditCard } from 'lucide-react';
+import { CreditCard, Heart, Lock } from 'lucide-react';
 
 // Dummy data
 const recentOrders = [
@@ -12,7 +12,7 @@ const recentlyViewed = [
   { id: 3, name: 'Smartphone Pro', price: 899.99, icon: '📱' },
 ];
 
-export default function Dashboard({ user }) {
+export default function History({ user }) {
   return (
     <div className="space-y-8">
       {/* Stats Cards */}

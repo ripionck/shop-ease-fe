@@ -1,5 +1,5 @@
+import { Lock, Minus, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { Minus, Plus, Trash2, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 const initialProducts = [
   {
@@ -22,7 +22,7 @@ const initialProducts = [
   },
 ];
 
-export default function ShoppingCart() {
+export default function Cart() {
   const [products, setProducts] = useState(initialProducts);
   const [promoCode, setPromoCode] = useState('');
 

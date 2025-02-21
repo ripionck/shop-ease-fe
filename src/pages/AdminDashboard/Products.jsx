@@ -1,6 +1,5 @@
 import { Edit, Search, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import Spinner from '../../components/Spinner';
 import useAuth from '../../hooks/useAuth';
 import useCategories from '../../hooks/useCategories';
 import useProducts from '../../hooks/useProducts';

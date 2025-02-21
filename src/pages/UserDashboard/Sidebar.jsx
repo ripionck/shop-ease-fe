@@ -1,14 +1,8 @@
-import {
-  Heart,
-  LayoutDashboard,
-  SettingsIcon,
-  ShoppingBag,
-  User,
-} from 'lucide-react';
+import { Heart, History, SettingsIcon, ShoppingBag, User } from 'lucide-react';
 
 export default function Sidebar({ user, currentPage, onNavigate }) {
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'history', label: 'History', icon: History },
     { id: 'orders', label: 'Orders', icon: ShoppingBag },
     { id: 'wishlist', label: 'Wishlist', icon: Heart },
     { id: 'profile', label: 'Profile', icon: User },
