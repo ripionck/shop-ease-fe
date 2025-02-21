@@ -1,31 +1,56 @@
-import { Trash2, ShoppingCart } from 'lucide-react';
-
-// Dummy wishlist data
-const wishlistItems = [
-  {
-    id: 1,
-    name: 'Wireless Headphones',
-    price: 299.99,
-    image: '🎧',
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: 'Premium Laptop',
-    price: 1299.99,
-    image: '💻',
-    inStock: true,
-  },
-  {
-    id: 3,
-    name: 'Smartphone Pro',
-    price: 899.99,
-    image: '📱',
-    inStock: false,
-  },
-];
+import axios from 'axios';
+import { ShoppingCart, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 export default function Wishlist() {
+  const [wishlistItems, setWishlistItems] = useState([]);
+
+  const token = localStorage.getItem('access_token');
+
+  // Fetch wishlist items
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const response = await axios.get(
+          'http://127.0.0.1:8000/api/v1/wishlist/',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        setWishlistItems(response.data.products);
+      } catch (error) {
+        console.error('Error fetching wishlist:', error);
+      }
+    };
+
+    fetchWishlist();
+  }, [token]);
+
+  // Remove item from wishlist
+  const handleRemoveFromWishlist = async (productId) => {
+    try {
+      await axios.delete(
+        `http://127.0.0.1:8000/api/v1/wishlist/remove/${productId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      // Update UI by filtering out the removed item
+      setWishlistItems((prevItems) =>
+        prevItems.filter((item) => item.product_id !== productId),
+      );
+      toast.success('Removed item from wishlist');
+    } catch (error) {
+      toast.error(error.message || 'Failed to remove item from wishlist');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -35,13 +60,22 @@ export default function Wishlist() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {wishlistItems.map((item) => (
-          <div key={item.id} className="bg-white rounded-lg shadow p-6">
+          <div key={item.product_id} className="bg-white rounded-lg shadow p-6">
             <div className="flex justify-end mb-4">
-              <button className="text-red-500 hover:text-red-600">
+              <button
+                onClick={() => handleRemoveFromWishlist(item.product_id)}
+                className="text-red-500 hover:text-red-600"
+              >
                 <Trash2 className="w-5 h-5" />
               </button>
             </div>
-            <div className="text-4xl mb-4 text-center">{item.image}</div>
+            {item.thumbnail && (
+              <img
+                src={item.thumbnail}
+                alt={item.name}
+                className="h-40 w-full object-contain mb-4"
+              />
+            )}
             <h3 className="font-semibold mb-2">{item.name}</h3>
             <p className="text-gray-600 mb-4">${item.price}</p>
             <div className="flex justify-between items-center">
