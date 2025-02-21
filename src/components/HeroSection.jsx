@@ -1,4 +1,5 @@
 import { Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function HeroSection() {
   return (
@@ -15,9 +16,12 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-wrap gap-4 mb-12">
-              <button className="px-8 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 flex items-center">
+              <Link
+                to="/shop"
+                className="px-8 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 flex items-center"
+              >
                 Shop Now
-              </button>
+              </Link>
               <button className="px-8 py-3 bg-white text-gray-700 rounded-full hover:bg-gray-50 flex items-center">
                 <Play className="w-4 h-4 mr-2" />
                 Watch Demo
@@ -45,32 +49,30 @@ export default function HeroSection() {
               <div className="space-y-4">
                 <div className="bg-white p-6 rounded-lg shadow-lg">
                   <img
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-02%20021049-SJyIQMQ8NoeVkqIYf818wGiaug2KCB.png"
-                    alt="Fashion Category"
-                    className="w-16 h-16 mb-4"
+                    src="/src/assets/computer.jpg"
+                    className="w-full h-40 mb-4"
                   />
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-lg">
                   <img
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-02%20021049-SJyIQMQ8NoeVkqIYf818wGiaug2KCB.png"
-                    alt="Electronics Category"
-                    className="w-16 h-16 mb-4"
+                    src="/src/assets/photography.jpg"
+                    className="w-full h-40 mb-4"
                   />
                 </div>
               </div>
               <div className="space-y-4 mt-8">
                 <div className="bg-white p-6 rounded-lg shadow-lg">
                   <img
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-02%20021049-SJyIQMQ8NoeVkqIYf818wGiaug2KCB.png"
-                    alt="Home & Living Category"
-                    className="w-16 h-16 mb-4"
+                    src="/src/assets/network.jpg"
+                    alt="Networking"
+                    className="w-full h-40 mb-4"
                   />
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-lg">
                   <img
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-02%20021049-SJyIQMQ8NoeVkqIYf818wGiaug2KCB.png"
-                    alt="Accessories Category"
-                    className="w-16 h-16 mb-4"
+                    src="/src/assets/smartphones.jpg"
+                    alt="Smartphones"
+                    className="w-full h-40 mb-4"
                   />
                 </div>
               </div>
