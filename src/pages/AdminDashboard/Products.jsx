@@ -1,101 +1,49 @@
-import axios from 'axios';
 import { Edit, Search, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Spinner from '../../components/Spinner';
 import useAuth from '../../hooks/useAuth';
+import useCategories from '../../hooks/useCategories';
+import useProducts from '../../hooks/useProducts';
 import AddProductModal from './AddProductModal';
 
 export default function Products() {
   const { auth } = useAuth();
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const {
+    products,
+    loading: productsLoading,
+    error: productsError,
+    fetchProducts,
+    createProduct,
+    deleteProduct,
+    uploadProductImage,
+  } = useProducts();
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log(products);
-
-  // Public API instance
-  const publicApi = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/v1/',
-  });
-
-  // Authenticated API instance
-  const authApi = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/v1/',
-    headers: {
-      Authorization: `Bearer ${auth?.accessToken}`,
-    },
-  });
-
-  // Fetch products
-  const fetchProducts = async () => {
-    try {
-      const params = {
-        search: searchTerm,
-        category: selectedCategory,
-        ordering: sortBy,
-      };
-      const response = await publicApi.get('products/', { params });
-      console.log('API Response:', response);
-
-      if (
-        response.data &&
-        response.data.products &&
-        Array.isArray(response.data.products)
-      ) {
-        setProducts(response.data.products);
-      } else {
-        setProducts([]);
-      }
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching products:', err);
-      console.error('Error Response:', err.response?.data);
-      setError(err.response?.data?.message || 'Failed to load products');
-      setLoading(false);
-    }
-  };
-
-  // Fetch categories
-  const fetchCategories = async () => {
-    try {
-      const response = await publicApi.get('categories/');
-      if (response.data && Array.isArray(response.data.categories)) {
-        setCategories(response.data.categories);
-      } else {
-        setCategories([]);
-      }
-    } catch (err) {
-      console.error('Error fetching categories:', err);
-      setError('Failed to load categories');
-    }
-  };
 
   useEffect(() => {
-    fetchProducts();
-    fetchCategories();
+    const params = {
+      search: searchTerm,
+      category: selectedCategory,
+      ordering: sortBy,
+    };
+    fetchProducts(params);
   }, [searchTerm, selectedCategory, sortBy]);
 
-  // Delete product (Admin only)
   const handleDelete = async (id) => {
     if (auth.user?.role !== 'admin') {
-      setError('Only admin users can delete products');
+      alert('Only admin users can delete products');
       return;
     }
-
-    try {
-      await authApi.delete(`products/${id}/`);
-      setProducts(products.filter((product) => product.id !== id));
-    } catch (err) {
-      console.error('Error deleting product:', err);
-      setError(err.response?.data?.message || 'Failed to delete product');
-    }
+    await deleteProduct(id);
   };
 
-  // Handle product creation/update
   const handleSubmit = async (formData) => {
     try {
       const productData = {
@@ -111,7 +59,7 @@ export default function Products() {
         specifications: formData.specifications,
       };
 
-      const productResponse = await authApi.post('products/', productData);
+      const productResponse = await createProduct(productData);
 
       // Upload images
       if (formData.images && formData.images.length > 0) {
@@ -120,24 +68,22 @@ export default function Products() {
             const imageFormData = new FormData();
             imageFormData.append('image', image.file);
             imageFormData.append('is_main', image.is_main);
-            await authApi.post(
-              `products/${productResponse.data.id}/images/`,
-              imageFormData,
-            );
+            await uploadProductImage(productResponse.id, imageFormData);
           }),
         );
       }
 
-      fetchProducts();
       setIsModalOpen(false);
     } catch (err) {
       console.error('Error creating product:', err);
-      setError(err.response?.data?.message || 'Failed to create product');
     }
   };
 
-  if (loading) return <Spinner />;
-  if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
+  if (productsLoading || categoriesLoading) return <Spinner />;
+  if (productsError)
+    return <div className="p-6 text-red-600">Error: {productsError}</div>;
+  if (categoriesError)
+    return <div className="p-6 text-red-600">Error: {categoriesError}</div>;
 
   return (
     <div className="space-y-6">
