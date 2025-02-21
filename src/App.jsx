@@ -5,7 +5,7 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
-import Featured from './pages/Featured';
+import Featured from './pages/Featured/Featured';
 import FlashDeals from './pages/FlashDeals';
 import Home from './pages/Home';
 import ProductDetail from './pages/Products/ProductDetail';
