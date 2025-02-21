@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-
+import PropTypes from 'prop-types';
 export default function OrderDetailsModal({ isOpen, onClose, order }) {
   if (!isOpen) return null;
 
@@ -98,3 +98,11 @@ export default function OrderDetailsModal({ isOpen, onClose, order }) {
     </div>
   );
 }
+
+OrderDetailsModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  order: PropTypes.shape({
+    id: PropTypes.string,
+  }),
+};

@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 export default function UpdateStockModal({ isOpen, onClose, item }) {
   if (!isOpen) return null;
@@ -69,3 +70,13 @@ export default function UpdateStockModal({ isOpen, onClose, item }) {
     </div>
   );
 }
+
+UpdateStockModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  item: PropTypes.shape({
+    name: PropTypes.string,
+    currentStock: PropTypes.number,
+    reorderPoint: PropTypes.number,
+  }),
+};

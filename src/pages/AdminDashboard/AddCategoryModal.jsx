@@ -113,14 +113,8 @@ AddCategoryModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   category: PropTypes.shape({
-    id: PropTypes.string,
     name: PropTypes.string,
     description: PropTypes.string,
-    totalProducts: PropTypes.number,
-    activeProducts: PropTypes.number,
-    outOfStock: PropTypes.number,
-    created_at: PropTypes.string,
-    updated_at: PropTypes.string,
   }),
 };
 
