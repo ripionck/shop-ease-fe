@@ -1,6 +1,6 @@
 import { ChevronRight, Heart, ShoppingCart, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-// Dummy product data
 const products = [
   {
     id: 1,
@@ -11,7 +11,7 @@ const products = [
     rating: 4,
     reviews: 124,
     discount: '-20%',
-    image: '/placeholder.svg',
+    image: '/src/assets/Wireless-Headphones.jpg',
     isNew: false,
     isHot: false,
   },
@@ -24,7 +24,7 @@ const products = [
     reviews: 89,
     isNew: true,
     isHot: false,
-    image: '/placeholder.svg',
+    image: '/src/assets/Ultra-Laptop-Pro.jpg',
   },
   {
     id: 3,
@@ -35,7 +35,7 @@ const products = [
     reviews: 246,
     isNew: false,
     isHot: false,
-    image: '/placeholder.svg',
+    image: '/src/assets/Smart-Phone-X.jpg',
   },
   {
     id: 4,
@@ -47,25 +47,9 @@ const products = [
     reviews: 167,
     isNew: false,
     isHot: true,
-    image: '/placeholder.svg',
+    image: '/src/assets/Smart-Watch-Pro.jpg',
   },
 ];
-
-const StarRating = ({ rating, reviews }) => {
-  return (
-    <div className="flex items-center gap-1">
-      {[...Array(5)].map((_, i) => (
-        <Star
-          key={i}
-          className={`w-4 h-4 ${
-            i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-          }`}
-        />
-      ))}
-      <span className="text-sm text-gray-500">({reviews})</span>
-    </div>
-  );
-};
 
 export default function FeaturedProducts() {
   return (
@@ -82,15 +66,15 @@ export default function FeaturedProducts() {
         {products.map((product) => (
           <div
             key={product.id}
-            className="bg-white rounded-lg shadow-md overflow-hidden"
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
           >
-            <div className="relative">
+            <div className="relative aspect-square">
               <img
                 src={product.image || '/placeholder.svg'}
                 alt={product.name}
-                className="w-full h-48 object-cover"
+                className="w-full h-full"
               />
-              <button className="absolute top-3 right-3 p-1.5 rounded-full bg-white/80 hover:bg-white">
+              <button className="absolute top-3 right-3 p-1.5 rounded-full bg-white/80 hover:bg-white backdrop-blur-sm">
                 <Heart className="w-5 h-5 text-gray-600" />
               </button>
               {product.discount && (
@@ -115,16 +99,31 @@ export default function FeaturedProducts() {
               <p className="text-gray-600 text-sm mb-2">
                 {product.description}
               </p>
-              <StarRating rating={product.rating} reviews={product.reviews} />
 
-              <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-1 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-4 h-4 ${
+                      i < Math.floor(product.rating)
+                        ? 'text-yellow-400 fill-current'
+                        : 'text-gray-300'
+                    }`}
+                  />
+                ))}
+                <span className="text-sm text-gray-500 ml-1">
+                  ({product.reviews})
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-indigo-600">
-                    ${product.price}
+                    ${product.price.toFixed(2)}
                   </span>
                   {product.originalPrice && (
                     <span className="text-sm text-gray-500 line-through">
-                      ${product.originalPrice}
+                      ${product.originalPrice.toFixed(2)}
                     </span>
                   )}
                 </div>
@@ -138,10 +137,13 @@ export default function FeaturedProducts() {
       </div>
 
       <div className="text-center mt-8">
-        <button className="inline-flex items-center gap-1 px-6 py-3 rounded-full bg-indigo-600 text-white hover:bg-indigo-700">
+        <Link
+          to="/shop"
+          className="inline-flex items-center gap-1 px-6 py-3 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+        >
           View All Products
-          <ChevronRight />
-        </button>
+          <ChevronRight className="w-4 h-4" />
+        </Link>
       </div>
     </section>
   );
