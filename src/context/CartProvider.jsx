@@ -37,13 +37,17 @@ export const CartProvider = ({ children }) => {
 
     setLoading(true);
     try {
-      const response = await api.post('cart/', {
-        product: productId,
+      const response = await api.post('cart/add/', {
+        product_id: productId,
         quantity,
       });
       setCartItems((prev) => [...prev, response.data]);
+      return true;
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add item to cart');
+      const errorMessage =
+        err.response?.data?.message || 'Failed to add item to cart';
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -57,7 +61,7 @@ export const CartProvider = ({ children }) => {
 
     setLoading(true);
     try {
-      const response = await api.put(`cart/${itemId}/`, { quantity });
+      const response = await api.put(`cart/update/${itemId}/`, { quantity });
       setCartItems((prev) =>
         prev.map((item) => (item.id === itemId ? response.data : item)),
       );
@@ -76,7 +80,7 @@ export const CartProvider = ({ children }) => {
 
     setLoading(true);
     try {
-      await api.delete(`cart/${itemId}/`);
+      await api.delete(`cart/remove/${itemId}/`);
       setCartItems((prev) => prev.filter((item) => item.id !== itemId));
     } catch (err) {
       setError(
