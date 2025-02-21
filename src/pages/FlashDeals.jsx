@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
 import { ShoppingCart } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 // Dummy data for flash deals
 const flashDeals = [
   {
     id: 1,
     name: 'Premium Laptop',
-    image: '/placeholder.svg',
+    image: '/src/assets/Premium-Laptop.jpg',
     price: 899,
     originalPrice: 1499,
     discount: '-40%',
@@ -14,7 +14,7 @@ const flashDeals = [
   {
     id: 2,
     name: 'Wireless Headphones',
-    image: '/placeholder.svg',
+    image: '/src/assets/Wireless-Headphone.jpg',
     price: 149,
     originalPrice: 299,
     discount: '-50%',
@@ -22,7 +22,7 @@ const flashDeals = [
   {
     id: 3,
     name: 'Smartphone Pro',
-    image: '/placeholder.svg',
+    image: '/src/assets/Smartphone-Pro.jpg',
     price: 699,
     originalPrice: 999,
     discount: '-30%',
@@ -104,7 +104,7 @@ export default function FlashDeals() {
               <img
                 src={deal.image || '/placeholder.svg'}
                 alt={deal.name}
-                className="w-full h-48 object-cover"
+                className="w-full h-72"
               />
               <span className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 text-sm rounded">
                 {deal.discount}
