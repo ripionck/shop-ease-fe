@@ -1,13 +1,14 @@
 import { X } from 'lucide-react';
 import PropTypes from 'prop-types';
+
 export default function OrderDetailsModal({ isOpen, onClose, order }) {
-  if (!isOpen) return null;
+  if (!isOpen || !order) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg max-w-4xl w-full p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">Order Details #{order?.id}</h2>
+          <h2 className="text-xl font-semibold">Order Details #{order.id}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
@@ -17,20 +18,31 @@ export default function OrderDetailsModal({ isOpen, onClose, order }) {
         </div>
 
         <div className="grid grid-cols-2 gap-8 mb-8">
+          {/* Customer Information */}
           <div>
             <h3 className="font-medium mb-2">Customer Information</h3>
-            <p className="text-gray-600">John Doe</p>
-            <p className="text-gray-600">john@example.com</p>
-            <p className="text-gray-600">+1 234 567 890</p>
+            <p className="text-gray-600">
+              {order.shipping_address.first_name}
+              {order.shipping_address.last_name}
+            </p>
+            <p className="text-gray-600"># {order.user_id}</p>
           </div>
+
+          {/* Shipping Address */}
           <div>
             <h3 className="font-medium mb-2">Shipping Address</h3>
-            <p className="text-gray-600">123 Main St</p>
-            <p className="text-gray-600">Apt 4B</p>
-            <p className="text-gray-600">New York, NY 10001</p>
+            <p className="text-gray-600">
+              {order.shipping_address.street_address}
+            </p>
+            <p className="text-gray-600">
+              {order.shipping_address.city}, {order.shipping_address.state}
+              {order.shipping_address.zip_code}
+            </p>
+            <p className="text-gray-600">{order.shipping_address.country}</p>
           </div>
         </div>
 
+        {/* Order Items */}
         <div className="mb-8">
           <h3 className="font-medium mb-4">Order Items</h3>
           <table className="w-full">
@@ -51,48 +63,29 @@ export default function OrderDetailsModal({ isOpen, onClose, order }) {
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b">
-                <td className="px-4 py-2">Wireless Headphones</td>
-                <td className="px-4 py-2">1</td>
-                <td className="px-4 py-2">$199.99</td>
-                <td className="px-4 py-2">$199.99</td>
-              </tr>
+              {order.items.map((item) => (
+                <tr key={item.product_id} className="border-b">
+                  <td className="px-4 py-2">{item.product_name}</td>
+                  <td className="px-4 py-2">{item.quantity}</td>
+                  <td className="px-4 py-2">${item.price}</td>
+                  <td className="px-4 py-2">
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
 
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Order Status
-            </label>
-            <select className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-              <option>New</option>
-              <option>Processing</option>
-              <option>Shipped</option>
-              <option>Delivered</option>
-            </select>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-600">Subtotal: $199.99</p>
-            <p className="text-sm text-gray-600">Shipping: $9.99</p>
-            <p className="text-lg font-semibold mt-2">Total: $209.98</p>
-          </div>
-        </div>
-
-        <div className="flex justify-end space-x-3">
-          <button
-            type="button"
-            className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
-          >
-            Print Invoice
-          </button>
-          <button
-            type="button"
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
-          >
-            Update Order
-          </button>
+        {/* Order Summary */}
+        <div className="text-right">
+          <p className="text-sm text-gray-600">
+            Subtotal: ${order.total_amount}
+          </p>
+          <p className="text-sm text-gray-600">Shipping: $9.99</p>
+          <p className="text-lg font-semibold mt-2">
+            Total: ${(parseFloat(order.total_amount) + 9.99).toFixed(2)}
+          </p>
         </div>
       </div>
     </div>
@@ -103,6 +96,25 @@ OrderDetailsModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   order: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.string.isRequired,
+    user_id: PropTypes.string.isRequired,
+    total_amount: PropTypes.string.isRequired,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        product_id: PropTypes.string.isRequired,
+        product_name: PropTypes.string.isRequired,
+        quantity: PropTypes.number.isRequired,
+        price: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
+    shipping_address: PropTypes.shape({
+      first_name: PropTypes.string.isRequired,
+      last_name: PropTypes.string.isRequired,
+      street_address: PropTypes.string.isRequired,
+      city: PropTypes.string.isRequired,
+      state: PropTypes.string.isRequired,
+      zip_code: PropTypes.string.isRequired,
+      country: PropTypes.string.isRequired,
+    }).isRequired,
   }),
 };

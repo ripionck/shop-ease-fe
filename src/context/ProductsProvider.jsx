@@ -39,14 +39,17 @@ export const ProductsProvider = ({ children }) => {
     setError(err.response?.data?.message || err.message || defaultMessage);
   };
 
-  const fetchProducts = async () => {
-    setError(null);
+  const fetchProducts = async (params = {}) => {
     setLoading(true);
     try {
-      const response = await publicApi.get('products/');
-      setProducts(response.data.products || []);
+      const response = await publicApi.get('products/', { params });
+      console.log(response);
+      setProducts({
+        results: response.data.results.products || [],
+        count: response.data.count || 0,
+      });
     } catch (err) {
-      handleError(err, 'Failed to fetch products');
+      setError(err.response?.data?.message || 'Failed to fetch products');
     } finally {
       setLoading(false);
     }

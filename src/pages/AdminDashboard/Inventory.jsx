@@ -1,4 +1,5 @@
-import { Search, Box } from 'lucide-react';
+import { Box, Search } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 // Dummy data
 const inventoryItems = [
@@ -149,3 +150,7 @@ export default function Inventory({ onOpenModal }) {
     </div>
   );
 }
+
+Inventory.propTypes = {
+  onOpenModal: PropTypes.func.isRequired,
+};

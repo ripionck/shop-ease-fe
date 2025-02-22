@@ -37,9 +37,9 @@ export default function AdminDashboard() {
     setSelectedItem(item);
   };
 
-  // // Redirect to /admin/analytics if the path is /admin
+  // // Redirect to /admin/products if the path is /admin
   // if (location.pathname === '/admin') {
-  //   return <Navigate to="/admin/analytics" replace />;
+  //   return <Navigate to="/admin/products" replace />;
   // }
 
   return (

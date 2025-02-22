@@ -26,14 +26,13 @@ export default function Categories() {
     },
   });
 
-  // Fetch categories (public)
   const fetchCategories = async () => {
     try {
       const response = await publicApi.get('categories/');
       setCategories(response.data.categories);
       setLoading(false);
     } catch (err) {
-      setError('Failed to load categories');
+      setError('Failed to load categories', err);
       setLoading(false);
     }
   };
@@ -42,7 +41,6 @@ export default function Categories() {
     fetchCategories();
   }, []);
 
-  // Delete category (Admin only)
   const handleDelete = async (id) => {
     if (auth.user?.role !== 'admin') {
       setError('Only admin users can delete categories');
@@ -57,7 +55,6 @@ export default function Categories() {
     }
   };
 
-  // Create/Update category (Admin only)
   const handleSubmit = async (formData) => {
     if (auth.user?.role !== 'admin') {
       setError('Only admin users can modify categories');
@@ -88,7 +85,12 @@ export default function Categories() {
     }
   };
 
-  if (loading) return <Spinner />;
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
 
   return (

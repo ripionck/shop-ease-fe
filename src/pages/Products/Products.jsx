@@ -32,7 +32,7 @@ const Products = () => {
           axios.get('http://127.0.0.1:8000/api/v1/categories/'),
         ]);
 
-        setProducts(productsResponse.data.products);
+        setProducts(productsResponse.data.results.products);
         setCategories(categoriesResponse.data.categories);
       } catch (error) {
         setError(error.message);
