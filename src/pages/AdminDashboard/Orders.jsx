@@ -1,69 +1,94 @@
-import { Search, ShoppingBag, Clock, Check, RotateCw } from 'lucide-react';
-const orders = [
-  {
-    id: '#ORD-001',
-    customer: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      avatar:
-        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-04%20042425-SJb5Hk9uejnYUwbNGLGYRco7RX0Dnl.png',
-    },
-    items: [
-      {
-        name: 'Wireless Headphones',
-        quantity: 1,
-        price: 199.99,
-      },
-    ],
-    total: 299.99,
-    status: 'New',
-    date: '2024-02-20',
-    shipping: {
-      address: '123 Main St',
-      apt: 'Apt 4B',
-      city: 'New York',
-      state: 'NY',
-      zip: '10001',
-    },
-    phone: '+1 234 567 890',
-  },
-  {
-    id: '#ORD-002',
-    customer: {
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      avatar:
-        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-04%20042425-SJb5Hk9uejnYUwbNGLGYRco7RX0Dnl.png',
-    },
-    items: [
-      {
-        name: 'Smart Watch',
-        quantity: 1,
-        price: 149.99,
-      },
-    ],
-    total: 149.99,
-    status: 'Processing',
-    date: '2024-02-19',
-    shipping: {
-      address: '456 Oak St',
-      apt: 'Unit 7',
-      city: 'Brooklyn',
-      state: 'NY',
-      zip: '11201',
-    },
-    phone: '+1 234 567 891',
-  },
-];
+import axios from 'axios';
+import { Check, Clock, RotateCw, Search, ShoppingBag } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
-const stats = [
-  { label: 'New Orders', value: '25', icon: ShoppingBag, color: 'blue' },
-  { label: 'Processing', value: '12', icon: Clock, color: 'orange' },
-  { label: 'Shipped', value: '48', icon: RotateCw, color: 'green' },
-  { label: 'Delivered', value: '156', icon: Check, color: 'gray' },
-];
+const getAccessToken = () => localStorage.getItem('access_token');
+
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api/v1/',
+  headers: {
+    Authorization: `Bearer ${getAccessToken()}`,
+  },
+});
 
 export default function Orders({ onOpenModal }) {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    newOrders: 0,
+    processing: 0,
+    shipped: 0,
+    delivered: 0,
+  });
+
+  // Fetch orders and calculate stats
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await api.get('/orders/');
+        setOrders(response.data.orders);
+
+        // Calculate stats
+        const newOrders = response.data.orders.filter(
+          (order) => order.status === 'pending',
+        ).length;
+        const processing = response.data.orders.filter(
+          (order) => order.status === 'processing',
+        ).length;
+        const shipped = response.data.orders.filter(
+          (order) => order.status === 'shipped',
+        ).length;
+        const delivered = response.data.orders.filter(
+          (order) => order.status === 'delivered',
+        ).length;
+
+        setStats({
+          newOrders,
+          processing,
+          shipped,
+          delivered,
+        });
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to fetch orders');
+        toast.error('Failed to fetch orders');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  // Update order status (admin only)
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await api.patch(`/orders/${orderId}/status/`, { status: newStatus });
+      toast.success('Order status updated successfully');
+
+      // Update local state
+      const updatedOrders = orders.map((order) =>
+        order.id === orderId ? { ...order, status: newStatus } : order,
+      );
+      setOrders(updatedOrders);
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || 'Failed to update order status',
+      );
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+
+  if (error)
+    return <div className="text-center p-8 text-red-600">Error: {error}</div>;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -73,8 +98,34 @@ export default function Orders({ onOpenModal }) {
         </button>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {stats.map((stat) => {
+        {[
+          {
+            label: 'New Orders',
+            value: stats.newOrders,
+            icon: ShoppingBag,
+            color: 'blue',
+          },
+          {
+            label: 'Processing',
+            value: stats.processing,
+            icon: Clock,
+            color: 'orange',
+          },
+          {
+            label: 'Shipped',
+            value: stats.shipped,
+            icon: RotateCw,
+            color: 'green',
+          },
+          {
+            label: 'Delivered',
+            value: stats.delivered,
+            icon: Check,
+            color: 'gray',
+          },
+        ].map((stat) => {
           const Icon = stat.icon;
           return (
             <div key={stat.label} className="bg-white p-6 rounded-lg shadow">
@@ -115,6 +166,7 @@ export default function Orders({ onOpenModal }) {
         })}
       </div>
 
+      {/* Orders Table */}
       <div className="bg-white rounded-lg shadow">
         <div className="p-4 border-b">
           <div className="flex items-center justify-between">
@@ -175,40 +227,50 @@ export default function Orders({ onOpenModal }) {
                 <td className="px-6 py-4">
                   <div className="flex items-center">
                     <img
-                      src={order.customer.avatar || '/placeholder.svg'}
-                      alt={order.customer.name}
+                      src={order.user.avatar || '/placeholder.svg'}
+                      alt={order.user.name}
                       className="w-8 h-8 rounded-full mr-3"
                     />
                     <div>
-                      <div className="font-medium">{order.customer.name}</div>
+                      <div className="font-medium">{order.user.name}</div>
                       <div className="text-sm text-gray-500">
-                        {order.customer.email}
+                        {order.user.email}
                       </div>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4">{order.items.length} items</td>
-                <td className="px-6 py-4">${order.total}</td>
+                <td className="px-6 py-4">${order.total_amount}</td>
                 <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  <select
+                    value={order.status}
+                    onChange={(e) =>
+                      updateOrderStatus(order.id, e.target.value)
+                    }
+                    className={`px-2 py-1 rounded-full text-xs font-medium
                     ${
-                      order.status === 'New'
+                      order.status === 'pending'
                         ? 'bg-blue-100 text-blue-800'
-                        : order.status === 'Processing'
+                        : order.status === 'processing'
                         ? 'bg-orange-100 text-orange-800'
-                        : order.status === 'Shipped'
+                        : order.status === 'shipped'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    {order.status}
-                  </span>
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
                 </td>
-                <td className="px-6 py-4">{order.date}</td>
+                <td className="px-6 py-4">
+                  {new Date(order.created_at).toLocaleDateString()}
+                </td>
                 <td className="px-6 py-4">
                   <button
-                    onClick={() => onOpenModal('orderDetails')}
+                    onClick={() => onOpenModal('orderDetails', order)}
                     className="text-blue-600 hover:text-blue-900"
                   >
                     View Details

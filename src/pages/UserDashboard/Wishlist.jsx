@@ -68,9 +68,9 @@ export default function Wishlist() {
                 <Trash2 className="w-5 h-5" />
               </button>
             </div>
-            {item.thumbnail && (
+            {item.image && (
               <img
-                src={item.thumbnail}
+                src={item.image}
                 alt={item.name}
                 className="h-40 w-full object-contain mb-4"
               />

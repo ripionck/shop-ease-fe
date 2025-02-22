@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import Spinner from '../../components/Spinner';
 
 const getAccessToken = () => localStorage.getItem('access_token');
@@ -20,14 +21,15 @@ export default function Orders() {
   const [totalPages, setTotalPages] = useState(1);
   const ordersPerPage = 5;
 
+  // Fetch orders from the backend
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await api.get('/orders/', {
           params: { page: currentPage, page_size: ordersPerPage },
         });
-        setOrders(response.data.results);
-        setTotalPages(Math.ceil(response.data.count / ordersPerPage));
+        setOrders(response.data.orders); // Use `orders` key from the response
+        setTotalPages(Math.ceil(response.data.orders.length / ordersPerPage)); // Adjust based on response
       } catch (err) {
         handleError(err);
       } finally {
@@ -38,16 +40,34 @@ export default function Orders() {
     fetchOrders();
   }, [currentPage]);
 
+  // Handle errors
   const handleError = (err) => {
     if (err.response?.status === 401) {
       window.location.href = '/login';
     } else {
       setError(err.response?.data?.message || 'Failed to fetch orders');
+      toast.error(err.response?.data?.message || 'An error occurred');
     }
   };
 
+  // Handle pagination
   const handlePageChange = (page) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  // Cancel an order
+  const handleCancelOrder = async (orderId) => {
+    try {
+      await api.patch(`/orders/${orderId}/cancel/`);
+      toast.success('Order cancelled successfully');
+      // Refresh orders after cancellation
+      const updatedOrders = orders.map((order) =>
+        order.id === orderId ? { ...order, status: 'cancelled' } : order,
+      );
+      setOrders(updatedOrders);
+    } catch (err) {
+      handleError(err);
+    }
   };
 
   if (loading)
@@ -79,7 +99,7 @@ export default function Orders() {
                   {
                     completed: 'bg-green-100 text-green-600',
                     pending: 'bg-yellow-100 text-yellow-600',
-                    canceled: 'bg-red-100 text-red-600',
+                    cancelled: 'bg-red-100 text-red-600',
                   }[order.status] || 'bg-gray-100 text-gray-600'
                 }`}
               >
@@ -89,15 +109,18 @@ export default function Orders() {
 
             <div className="border-t pt-4">
               {order.items.map((item) => (
-                <div key={item.id} className="flex justify-between py-2">
+                <div
+                  key={item.product_id}
+                  className="flex justify-between py-2"
+                >
                   <div className="flex items-center gap-4">
                     <img
-                      src={item.product.thumbnail}
-                      alt={item.product.name}
+                      src={item.product_image}
+                      alt={item.product_name}
                       className="w-12 h-12 object-cover rounded"
                     />
                     <div>
-                      <p className="font-medium">{item.product.name}</p>
+                      <p className="font-medium">{item.product_name}</p>
                       <p className="text-sm text-gray-600">
                         Qty: {item.quantity}
                       </p>
@@ -109,6 +132,37 @@ export default function Orders() {
                 </div>
               ))}
             </div>
+
+            {/* Shipping Address */}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-medium mb-2">Shipping Address</h3>
+              <p className="text-sm text-gray-600">
+                {order.shipping_address.first_name}{' '}
+                {order.shipping_address.last_name}
+              </p>
+              <p className="text-sm text-gray-600">
+                {order.shipping_address.street_address}
+              </p>
+              <p className="text-sm text-gray-600">
+                {order.shipping_address.city}, {order.shipping_address.state}{' '}
+                {order.shipping_address.zip_code}
+              </p>
+              <p className="text-sm text-gray-600">
+                {order.shipping_address.country}
+              </p>
+            </div>
+
+            {/* Cancel Order Button */}
+            {order.status === 'pending' && (
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={() => handleCancelOrder(order.id)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                >
+                  Cancel Order
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

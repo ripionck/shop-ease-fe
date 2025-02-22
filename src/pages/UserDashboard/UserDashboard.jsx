@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import History from './History';
 import Orders from './Orders';
 import Profile from './Profile';
 import Settings from './Settings';
@@ -23,18 +22,16 @@ export default function UserDashboard() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'history':
-        return <History user={userData} />;
-      case 'orders':
-        return <Orders />;
       case 'wishlist':
         return <Wishlist />;
+      case 'orders':
+        return <Orders />;
       case 'profile':
         return <Profile user={userData} />;
       case 'settings':
         return <Settings />;
       default:
-        return <History user={userData} />;
+        return <Wishlist />;
     }
   };
 

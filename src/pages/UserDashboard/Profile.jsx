@@ -1,54 +1,133 @@
-import { CreditCard, Pencil, Trash } from 'lucide-react';
-import { useState } from 'react';
-import AddAddressModal from './AddAddressModal';
+import axios from 'axios';
+import { CreditCard, Trash } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import EditAddressModal from './EditAddressModal';
+
+const getAccessToken = () => localStorage.getItem('access_token');
+
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api/v1/',
+  headers: {
+    Authorization: `Bearer ${getAccessToken()}`,
+  },
+});
 
 export default function Profile() {
-  const [personalInfo, setPersonalInfo] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 234 567 890',
+  const [profile, setProfile] = useState({
+    username: '',
+    email: '',
+    phone: '',
+    street: '',
+    city: '',
+    state: '',
+    country: '',
+    zip_code: '',
+    image: null,
   });
-  const [showAddAddressModal, setShowAddAddressModal] = useState(false);
+  const [showEditAddressModal, setShowEditAddressModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const addresses = [
-    {
-      id: 1,
-      type: 'Home',
-      street: '123 Main Street, Apt 4B',
-      city: 'New York',
-      state: 'NY',
-      zip: '10001',
-    },
-    {
-      id: 2,
-      type: 'Work',
-      street: '456 Business Ave',
-      city: 'New York',
-      state: 'NY',
-      zip: '10002',
-    },
-  ];
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/profile/');
+        const {
+          username,
+          email,
+          phone_number,
+          street,
+          city,
+          state,
+          country,
+          zip_code,
+          image,
+        } = response.data;
+        setProfile({
+          username,
+          email,
+          phone: phone_number,
+          street,
+          city,
+          state,
+          country,
+          zip_code,
+          image,
+        });
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to fetch profile');
+        toast.error('Failed to fetch profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleInfoChange = (e) => {
-    setPersonalInfo({
-      ...personalInfo,
+    setProfile({
+      ...profile,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleAddAddress = () => {
-    setShowAddAddressModal(true);
+  const handleSaveProfile = async () => {
+    try {
+      await api.patch('/profile/', {
+        username: profile.username,
+        email: profile.email,
+        phone_number: profile.phone,
+        street: profile.street,
+        city: profile.city,
+        state: profile.state,
+        country: profile.country,
+        zip_code: profile.zip_code,
+      });
+      toast.success('Profile updated successfully');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update profile');
+    }
+  };
+
+  const handleEditAddress = () => {
+    setShowEditAddressModal(true);
   };
 
   const handleCloseModal = () => {
-    setShowAddAddressModal(false);
+    setShowEditAddressModal(false);
   };
 
-  const handleSaveAddress = (newAddress) => {
-    // Handle saving the new address
-    setShowAddAddressModal(false);
+  const handleSaveAddress = async (updatedAddress) => {
+    try {
+      await api.patch('/profile/', updatedAddress);
+      toast.success('Address updated successfully');
+      setShowEditAddressModal(false);
+      // Refresh profile data
+      const response = await api.get('/profile/');
+      setProfile({
+        ...profile,
+        street: response.data.street,
+        city: response.data.city,
+        state: response.data.state,
+        country: response.data.country,
+        zip_code: response.data.zip_code,
+      });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update address');
+    }
   };
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+
+  if (error)
+    return <div className="text-center p-8 text-red-600">Error: {error}</div>;
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-8">
@@ -56,7 +135,7 @@ export default function Profile() {
       <div className="flex items-start gap-6">
         <div className="relative">
           <img
-            src="https://avatar.iran.liara.run/public"
+            src={profile.image || 'https://avatar.iran.liara.run/public'}
             alt="Profile"
             className="w-24 h-24 rounded-full"
           />
@@ -65,7 +144,7 @@ export default function Profile() {
           </button>
         </div>
         <div>
-          <h1 className="text-2xl font-semibold">John Doe</h1>
+          <h1 className="text-2xl font-semibold">{profile.username}</h1>
           <p className="text-gray-500">Member since October 2023</p>
         </div>
       </div>
@@ -76,24 +155,12 @@ export default function Profile() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              First Name
+              Username
             </label>
             <input
               type="text"
-              name="firstName"
-              value={personalInfo.firstName}
-              onChange={handleInfoChange}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
-            </label>
-            <input
-              type="text"
-              name="lastName"
-              value={personalInfo.lastName}
+              name="username"
+              value={profile.username}
               onChange={handleInfoChange}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
             />
@@ -105,7 +172,7 @@ export default function Profile() {
             <input
               type="email"
               name="email"
-              value={personalInfo.email}
+              value={profile.email}
               onChange={handleInfoChange}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
             />
@@ -117,52 +184,43 @@ export default function Profile() {
             <input
               type="tel"
               name="phone"
-              value={personalInfo.phone}
+              value={profile.phone}
               onChange={handleInfoChange}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         </div>
         <div className="flex justify-end">
-          <button className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">
+          <button
+            onClick={handleSaveProfile}
+            className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
+          >
             Save Changes
           </button>
         </div>
       </div>
 
-      {/* Delivery Addresses */}
+      {/* Delivery Address */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Delivery Addresses</h2>
+          <h2 className="text-xl font-semibold">Delivery Address</h2>
           <button
-            onClick={handleAddAddress}
+            onClick={handleEditAddress}
             className="text-indigo-500 hover:text-indigo-600"
           >
-            Add New Address
+            Edit Address
           </button>
         </div>
-        <div className="space-y-4">
-          {addresses.map((address) => (
-            <div key={address.id} className="p-4 border rounded-lg">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{address.type}</h3>
-                  <p className="text-gray-600">{address.street}</p>
-                  <p className="text-gray-600">
-                    {address.city}, {address.state} {address.zip}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button className="p-2 text-gray-500 hover:text-gray-700">
-                    <Pencil className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 text-gray-500 hover:text-gray-700">
-                    <Trash className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+        <div className="p-4 border rounded-lg">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-gray-600">{profile.street}</p>
+              <p className="text-gray-600">
+                {profile.city}, {profile.state} {profile.zip_code}
+              </p>
+              <p className="text-gray-600">{profile.country}</p>
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
@@ -190,11 +248,17 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Add Address Modal */}
-      {showAddAddressModal && (
-        <AddAddressModal
+      {showEditAddressModal && (
+        <EditAddressModal
           onClose={handleCloseModal}
           onSave={handleSaveAddress}
+          initialData={{
+            street: profile.street,
+            city: profile.city,
+            state: profile.state,
+            country: profile.country,
+            zip_code: profile.zip_code,
+          }}
         />
       )}
     </div>
