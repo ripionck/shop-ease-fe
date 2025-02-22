@@ -8,7 +8,7 @@ import Checkout from './pages/Checkout';
 import Featured from './pages/Featured/Featured';
 import FlashDeals from './pages/FlashDeals';
 import Home from './pages/Home';
-import ProductDetailContainer from './pages/Products/ProductDetailContainer';
+import ProductDetails from './pages/Products/ProductDetails';
 import Products from './pages/Products/Products';
 import UserDashboard from './pages/UserDashboard/UserDashboard';
 
@@ -22,7 +22,7 @@ function App() {
           <Route path="register" element={<Register />} />
           <Route path="featured" element={<Featured />} />
           <Route path="shop" element={<Products />} />
-          <Route path="products/:id" element={<ProductDetailContainer />} />
+          <Route path="products/:id" element={<ProductDetails />} />
           <Route path="flash-deals" element={<FlashDeals />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
