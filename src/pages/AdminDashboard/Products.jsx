@@ -1,10 +1,12 @@
-import { Edit, Search, Trash } from 'lucide-react';
+import { Edit, Search, Trash, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import Spinner from '../../components/Spinner';
 import useAuth from '../../hooks/useAuth';
 import useCategories from '../../hooks/useCategories';
 import useProducts from '../../hooks/useProducts';
 import AddProductModal from './AddProductModal';
+import ImageUploadModal from './ImageUploadModal';
 
 export default function Products() {
   const { auth } = useAuth();
@@ -14,6 +16,7 @@ export default function Products() {
     error: productsError,
     fetchProducts,
     createProduct,
+    updateProduct,
     deleteProduct,
     uploadProductImage,
   } = useProducts();
@@ -22,13 +25,15 @@ export default function Products() {
     loading: categoriesLoading,
     error: categoriesError,
   } = useCategories();
-
+  const [productToEdit, setProductToEdit] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
   // Fetch products with filters, sorting, and pagination
   useEffect(() => {
@@ -42,61 +47,35 @@ export default function Products() {
     fetchProducts(params);
   }, [searchTerm, selectedCategory, sortBy, currentPage]);
 
+  const handleSubmit = async (formData) => {
+    try {
+      if (productToEdit) {
+        // Call update API if editing
+        await updateProduct(productToEdit.id, formData);
+        toast.success('Product updated successfully!');
+      } else {
+        // Call create API if adding
+        await createProduct(formData);
+        toast.success('Product created successfully!');
+      }
+      setIsModalOpen(false);
+      setProductToEdit(null);
+      fetchProducts();
+    } catch (err) {
+      console.error('Error:', err);
+      toast.error('Failed to save product. Please check the data.');
+    }
+  };
+
   // Handle product deletion
   const handleDelete = async (id) => {
     if (auth.user?.role !== 'admin') {
-      alert('Only admin users can delete products');
+      toast.error('Only admin users can delete products');
       return;
     }
     await deleteProduct(id);
-    fetchProducts(); // Refresh the list after deletion
-  };
-
-  // Handle search input change
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
-  };
-
-  // Handle category filter change
-  const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value);
-    setCurrentPage(1); // Reset to first page when filtering
-  };
-
-  // Handle sorting change
-  const handleSortChange = (e) => {
-    setSortBy(e.target.value);
-    setCurrentPage(1); // Reset to first page when sorting
-  };
-
-  // Handle product creation and image upload
-  const handleSubmit = async (formData) => {
-    try {
-      // Create the product
-      const productResponse = await createProduct({
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        category_id: formData.category_id,
-        brand: formData.brand,
-        stock_quantity: formData.stock_quantity,
-      });
-
-      // Upload images after product creation
-      if (formData.images && formData.images.length > 0) {
-        await Promise.all(
-          formData.images.map(async (image) => {
-            await uploadProductImage(productResponse.id, image.file);
-          }),
-        );
-      }
-
-      setIsModalOpen(false);
-      fetchProducts(); // Refresh the product list
-    } catch (err) {
-      console.error('Error creating product:', err);
-    }
+    fetchProducts();
+    toast.success('Product deleted successfully!');
   };
 
   // Loading and error states
@@ -135,7 +114,7 @@ export default function Products() {
                 type="text"
                 placeholder="Search products..."
                 value={searchTerm}
-                onChange={handleSearchChange}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
@@ -143,7 +122,7 @@ export default function Products() {
             <div className="flex items-center gap-4">
               <select
                 value={selectedCategory}
-                onChange={handleCategoryChange}
+                onChange={(e) => setSelectedCategory(e.target.value)}
                 className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Categories</option>
@@ -155,7 +134,7 @@ export default function Products() {
               </select>
               <select
                 value={sortBy}
-                onChange={handleSortChange}
+                onChange={(e) => setSortBy(e.target.value)}
                 className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Sort by</option>
@@ -217,7 +196,7 @@ export default function Products() {
                       <button
                         onClick={() => {
                           setIsModalOpen(true);
-                          // Pass product to modal for editing
+                          setProductToEdit(product);
                         }}
                         className="text-blue-600 hover:text-blue-900"
                       >
@@ -228,6 +207,15 @@ export default function Products() {
                         className="text-red-600 hover:text-red-900"
                       >
                         <Trash className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedProductId(product.id);
+                          setIsImageModalOpen(true);
+                        }}
+                        className="text-green-600 hover:text-green-700"
+                      >
+                        <Upload className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -264,13 +252,28 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Add Product Modal */}
       {auth.user?.role === 'admin' && (
         <AddProductModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setProductToEdit(null);
+          }}
           onSubmit={handleSubmit}
           categories={categories}
+          productToEdit={productToEdit}
+        />
+      )}
+
+      {auth.user?.role === 'admin' && (
+        <ImageUploadModal
+          isOpen={isImageModalOpen}
+          onClose={() => {
+            setIsImageModalOpen(false);
+            setSelectedProductId(null);
+          }}
+          productId={selectedProductId}
+          uploadProductImage={uploadProductImage}
         />
       )}
     </div>

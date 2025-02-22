@@ -1,7 +1,13 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const AddProductModal = ({ isOpen, onClose, onSubmit, categories }) => {
+const AddProductModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  categories,
+  productToEdit,
+}) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -13,7 +19,41 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories }) => {
   const [features, setFeatures] = useState('');
   const [specifications, setSpecifications] = useState([]);
   const [tags, setTags] = useState('');
-  const [images, setImages] = useState([]);
+
+  // Set initial values when productToEdit changes
+  useEffect(() => {
+    if (productToEdit) {
+      setName(productToEdit.name);
+      setDescription(productToEdit.description);
+      setPrice(productToEdit.price);
+      setDiscountedPrice(productToEdit.discounted_price || '');
+      setCategoryId(productToEdit.category_id);
+      setBrand(productToEdit.brand);
+      setStockQuantity(productToEdit.stock_quantity);
+      setIsActive(productToEdit.is_active);
+      setFeatures(productToEdit.features.join(', '));
+      setSpecifications(
+        Object.entries(productToEdit.specifications).map(([key, value]) => ({
+          key,
+          value,
+        })),
+      );
+      setTags(productToEdit.tags.join(', '));
+    } else {
+      // Reset form if no product is being edited
+      setName('');
+      setDescription('');
+      setPrice('');
+      setDiscountedPrice('');
+      setCategoryId('');
+      setBrand('');
+      setStockQuantity('');
+      setIsActive(true);
+      setFeatures('');
+      setSpecifications([]);
+      setTags('');
+    }
+  }, [productToEdit]);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -22,34 +62,18 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories }) => {
       description,
       price: parseFloat(price),
       discounted_price: discountedPrice ? parseFloat(discountedPrice) : null,
-      category: categoryId,
+      category_id: categoryId,
       brand,
       stock_quantity: parseInt(stockQuantity),
       is_active: isActive,
       features: features.split(',').map((f) => f.trim()),
-      specifications: Object.fromEntries(
-        specifications.map(({ key, value }) => [key, value]),
-      ),
+      specifications: specifications.reduce((acc, { key, value }) => {
+        if (key && value) acc.push({ key, value });
+        return acc;
+      }, []),
       tags: tags.split(',').map((t) => t.trim()),
-      images,
     };
     onSubmit(formData);
-  };
-
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files).map((file) => ({
-      file,
-      is_main: false,
-    }));
-    setImages(files);
-  };
-
-  const setMainImage = (index) => {
-    const updatedImages = images.map((img, i) => ({
-      ...img,
-      is_main: i === index,
-    }));
-    setImages(updatedImages);
   };
 
   const addSpecification = () => {
@@ -73,12 +97,13 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories }) => {
         isOpen ? '' : 'hidden'
       }`}
     >
-      {/* Scrollable Modal */}
       <div
         className="bg-white rounded-lg p-6 w-full max-w-2xl overflow-y-auto"
         style={{ maxHeight: '90vh' }}
       >
-        <h2 className="text-xl font-semibold mb-4">Add Product</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          {productToEdit ? 'Edit Product' : 'Add Product'}
+        </h2>
         <form onSubmit={handleFormSubmit}>
           {/* Name and Brand */}
           <div className="grid grid-cols-2 gap-4">
@@ -144,6 +169,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories }) => {
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               className="w-full p-2 border rounded-lg"
+              required
             >
               <option value="">Select Category</option>
               {categories.map((category) => (
@@ -221,64 +247,6 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories }) => {
             </button>
           </div>
 
-          {/* Custom Image Upload Input */}
-          <div className="border-t pt-4 mt-4">
-            <label className="block mb-2 font-medium">Product Images</label>
-            <label
-              htmlFor="image-upload"
-              className="flex items-center justify-center space-x-2 cursor-pointer bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg p-3 w-full"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              <span className="text-gray-600">
-                {images.length > 0
-                  ? `${images.length} file(s) selected`
-                  : 'Choose files'}
-              </span>
-            </label>
-            <input
-              id="image-upload"
-              type="file"
-              multiple
-              onChange={handleImageUpload}
-              className="hidden"
-              accept="image/*"
-            />
-            <div className="mt-4 space-y-2">
-              {images.map((image, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-2 border rounded"
-                >
-                  <span className="truncate">{image.file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => setMainImage(index)}
-                    className={`px-3 py-1 rounded text-sm ${
-                      image.is_main
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 hover:bg-gray-300'
-                    }`}
-                  >
-                    {image.is_main ? 'Main Image' : 'Set as Main'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Active Checkbox */}
           <label className="flex items-center space-x-2 mt-4">
             <input
@@ -303,7 +271,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories }) => {
               type="submit"
               className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
             >
-              Create Product
+              {productToEdit ? 'Update Product' : 'Create Product'}
             </button>
           </div>
         </form>
@@ -322,6 +290,7 @@ AddProductModal.propTypes = {
       name: PropTypes.string.isRequired,
     }),
   ).isRequired,
+  productToEdit: PropTypes.object,
 };
 
 export default AddProductModal;

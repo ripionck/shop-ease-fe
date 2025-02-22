@@ -1,11 +1,11 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import ProductsContext from './ProductsContext';
 
 export const ProductsProvider = ({ children }) => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState({ results: [], count: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { auth } = useAuth();
@@ -30,11 +30,6 @@ export const ProductsProvider = ({ children }) => {
     [],
   );
 
-  // Optional: Fetch products on initial load
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
   const handleError = (err, defaultMessage) => {
     setError(err.response?.data?.message || err.message || defaultMessage);
   };
@@ -43,7 +38,6 @@ export const ProductsProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await publicApi.get('products/', { params });
-      console.log(response);
       setProducts({
         results: response.data.results.products || [],
         count: response.data.count || 0,
@@ -70,7 +64,10 @@ export const ProductsProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await api.post('products/', productData);
-      setProducts((prev) => [...prev, response.data]);
+      setProducts((prev) => ({
+        ...prev,
+        results: [...prev.results, response.data],
+      }));
     } catch (err) {
       handleError(err, 'Failed to create product');
     } finally {
@@ -84,10 +81,13 @@ export const ProductsProvider = ({ children }) => {
     setError(null);
     setLoading(true);
     try {
-      const response = await api.put(`products/${id}/`, productData);
-      setProducts((prev) =>
-        prev.map((product) => (product.id === id ? response.data : product)),
-      );
+      const response = await api.patch(`products/${id}/`, productData);
+      setProducts((prev) => ({
+        ...prev,
+        results: prev.results.map((product) =>
+          product.id === id ? response.data : product,
+        ),
+      }));
     } catch (err) {
       handleError(err, 'Failed to update product');
     } finally {
@@ -102,7 +102,10 @@ export const ProductsProvider = ({ children }) => {
     setLoading(true);
     try {
       await api.delete(`products/${id}/`);
-      setProducts((prev) => prev.filter((product) => product.id !== id));
+      setProducts((prev) => ({
+        ...prev,
+        results: prev.results.filter((product) => product.id !== id),
+      }));
     } catch (err) {
       handleError(err, 'Failed to delete product');
     } finally {
@@ -110,7 +113,7 @@ export const ProductsProvider = ({ children }) => {
     }
   };
 
-  const uploadProductImage = async (productId, imageFile) => {
+  const uploadProductImage = async (productId, imageFile, isMain = false) => {
     if (!verifyAdmin()) return;
 
     setError(null);
@@ -118,6 +121,8 @@ export const ProductsProvider = ({ children }) => {
     try {
       const formData = new FormData();
       formData.append('image', imageFile);
+      formData.append('is_main', isMain);
+
       const response = await api.post(
         `products/${productId}/images/`,
         formData,
@@ -127,8 +132,10 @@ export const ProductsProvider = ({ children }) => {
           },
         },
       );
-      setProducts((prev) =>
-        prev.map((product) =>
+
+      setProducts((prev) => ({
+        ...prev,
+        results: prev.results.map((product) =>
           product.id === productId
             ? {
                 ...product,
@@ -136,7 +143,7 @@ export const ProductsProvider = ({ children }) => {
               }
             : product,
         ),
-      );
+      }));
     } catch (err) {
       handleError(err, 'Failed to upload product image');
     } finally {

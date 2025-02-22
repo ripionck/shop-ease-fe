@@ -1,8 +1,40 @@
 import { X } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 
-export default function UpdateStockModal({ isOpen, onClose, item }) {
+export default function UpdateStockModal({
+  isOpen,
+  onClose,
+  product,
+  onUpdateStock,
+}) {
+  const [newStockQuantity, setNewStockQuantity] = useState(
+    product?.stock_quantity || 0,
+  );
+  const [error, setError] = useState('');
+
+  // Update state when product changes
+  useEffect(() => {
+    if (product) {
+      setNewStockQuantity(product.stock_quantity);
+    }
+  }, [product]);
+
   if (!isOpen) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Validate input
+    if (newStockQuantity < 0) {
+      setError('Stock quantity cannot be negative.');
+      return;
+    }
+
+    // Call the parent handler to update stock
+    onUpdateStock(product.id, newStockQuantity);
+    onClose(); // Close the modal after submission
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -17,7 +49,19 @@ export default function UpdateStockModal({ isOpen, onClose, item }) {
           </button>
         </div>
 
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Product Name
+            </label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              value={product?.name || ''}
+              readOnly
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Current Stock
@@ -25,30 +69,14 @@ export default function UpdateStockModal({ isOpen, onClose, item }) {
             <input
               type="number"
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              defaultValue={item?.currentStock}
+              value={newStockQuantity}
+              onChange={(e) => setNewStockQuantity(parseInt(e.target.value))}
+              min="0"
+              required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Reorder Point
-            </label>
-            <input
-              type="number"
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              defaultValue={item?.reorderPoint}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
-            </label>
-            <textarea
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              rows="4"
-            />
-          </div>
+          {error && <div className="text-red-600 text-sm">{error}</div>}
 
           <div className="flex justify-end space-x-3 mt-6">
             <button
@@ -62,7 +90,7 @@ export default function UpdateStockModal({ isOpen, onClose, item }) {
               type="submit"
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
             >
-              Update
+              Update Stock
             </button>
           </div>
         </form>
@@ -74,9 +102,10 @@ export default function UpdateStockModal({ isOpen, onClose, item }) {
 UpdateStockModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  item: PropTypes.shape({
-    name: PropTypes.string,
-    currentStock: PropTypes.number,
-    reorderPoint: PropTypes.number,
+  product: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    stock_quantity: PropTypes.number.isRequired,
   }),
+  onUpdateStock: PropTypes.func.isRequired,
 };
