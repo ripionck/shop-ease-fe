@@ -1,4 +1,5 @@
 import { CheckCircle } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 export function ConfirmationModal({ isOpen, onClose, orderDetails }) {
   if (!isOpen) return null;
@@ -37,3 +38,13 @@ export function ConfirmationModal({ isOpen, onClose, orderDetails }) {
     </div>
   );
 }
+
+ConfirmationModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  orderDetails: PropTypes.shape({
+    number: PropTypes.string.isRequired,
+    total: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    date: PropTypes.string,
+  }).isRequired,
+};

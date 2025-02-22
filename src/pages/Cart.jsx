@@ -121,7 +121,12 @@ export default function Cart() {
     fetchCart();
   }, []);
 
-  if (initialLoading) return <Spinner />;
+  if (initialLoading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
 
   if (error) {
     return (

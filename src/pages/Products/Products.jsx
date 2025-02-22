@@ -131,7 +131,12 @@ const Products = () => {
     }
   };
 
-  if (loading) return <Spinner />;
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   if (error)
     return <div className="text-center py-8 text-red-600">Error: {error}</div>;
 

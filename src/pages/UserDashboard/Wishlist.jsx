@@ -8,7 +8,6 @@ export default function Wishlist() {
 
   const token = localStorage.getItem('access_token');
 
-  // Fetch wishlist items
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
