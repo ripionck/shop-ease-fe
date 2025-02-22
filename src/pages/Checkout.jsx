@@ -1,16 +1,24 @@
 import axios from 'axios';
-import { Lock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ConfirmationModal } from '../components/ConfirmationModal';
 import Spinner from '../components/Spinner';
 
+const getAccessToken = () => localStorage.getItem('access_token');
+
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api/v1/',
+  headers: {
+    Authorization: `Bearer ${getAccessToken()}`,
+  },
+});
+
 export default function Checkout() {
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formLoading, setFormLoading] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -20,30 +28,15 @@ export default function Checkout() {
     state: '',
     country: '',
     zipCode: '',
-    cardNumber: '',
-    expDate: '',
-    cvv: '',
   });
-
-  // Get access token
-  const getAccessToken = () => localStorage.getItem('access_token');
-
-  // Handle unauthorized
-  const handleUnauthorized = () => {
-    localStorage.removeItem('access_token');
-    window.location.href = '/login';
-  };
 
   // Fetch cart items
   const fetchCart = async () => {
     try {
-      const { data } = await axios.get('http://127.0.0.1:8000/api/v1/cart/', {
-        headers: { Authorization: `Bearer ${getAccessToken()}` },
-      });
+      const { data } = await api.get('/cart/');
       setCartItems(data.cart.products || []);
-    } catch (error) {
-      if (error.response?.status === 401) handleUnauthorized();
-      else toast.error('Failed to load cart');
+    } catch (err) {
+      handleError(err);
     } finally {
       setLoading(false);
     }
@@ -54,51 +47,24 @@ export default function Checkout() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Validate form
-  const validateForm = () => {
-    const requiredFields = [
-      'firstName',
-      'lastName',
-      'address',
-      'city',
-      'state',
-      'country',
-      'zipCode',
-    ];
-    return requiredFields.every((field) => formData[field].trim());
-  };
-
-  // Process payment
-  const processPayment = async (orderId, amount) => {
-    try {
-      const paymentPayload = {
-        order: orderId,
-        amount: amount.toFixed(2),
-        payment_method: 'credit_card',
-      };
-
-      await axios.post(
-        'http://127.0.0.1:8000/api/v1/payments/',
-        paymentPayload,
-        { headers: { Authorization: `Bearer ${getAccessToken()}` } },
-      );
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || 'Payment processing failed',
-      );
+  // Handle errors
+  const handleError = (err) => {
+    if (err.response?.status === 401) {
+      window.location.href = '/login';
+    } else {
+      toast.error(err.response?.data?.message || 'An error occurred');
     }
   };
 
-  // Submit order
-  const handlePlaceOrder = async (e) => {
+  // Handle checkout
+  const handleCheckout = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return toast.error('Please fill all required fields');
 
     try {
       setFormLoading(true);
 
-      // Step 1: Create order
-      const orderPayload = {
+      // 1. Create Order
+      const orderResponse = await api.post('/orders/create/', {
         shipping_address: {
           first_name: formData.firstName,
           last_name: formData.lastName,
@@ -108,29 +74,14 @@ export default function Checkout() {
           country: formData.country,
           zip_code: formData.zipCode,
         },
-        payment_method: 'credit_card',
-      };
-
-      const { data: order } = await axios.post(
-        'http://127.0.0.1:8000/api/v1/orders/create/',
-        orderPayload,
-        { headers: { Authorization: `Bearer ${getAccessToken()}` } },
-      );
-
-      // Step 2: Process payment
-      await processPayment(order.id, order.total_amount);
-
-      // Step 3: Clear cart
-      await axios.delete('http://127.0.0.1:8000/api/v1/cart/clear/', {
-        headers: { Authorization: `Bearer ${getAccessToken()}` },
       });
 
-      setOrderDetails(order);
+      // 2. Show Confirmation (Skip clearing cart if API is not available)
+      setOrderDetails(orderResponse.data);
       setShowConfirmation(true);
       toast.success('Order placed successfully!');
-    } catch (error) {
-      toast.error(error.message || 'Order failed');
-      if (error.response?.status === 401) handleUnauthorized();
+    } catch (err) {
+      handleError(err);
     } finally {
       setFormLoading(false);
     }
@@ -160,26 +111,21 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Progress Steps */}
+        {/* Progress Bar */}
         <div className="mb-8">
-          <div className="flex items-center justify-center">
-            <div className="flex items-center">
-              <div className="bg-indigo-600 rounded-full h-8 w-8 flex items-center justify-center text-white">
-                1
-              </div>
-              <div className="h-1 w-24 bg-indigo-600"></div>
-              <div className="bg-indigo-600 rounded-full h-8 w-8 flex items-center justify-center text-white">
-                2
-              </div>
-              <div className="h-1 w-24 bg-gray-200"></div>
-              <div className="border-2 border-gray-200 rounded-full h-8 w-8 flex items-center justify-center text-gray-400">
-                3
-              </div>
+          <div className="flex justify-between items-center">
+            <div className="flex-1">
+              <div className="h-2 bg-indigo-600 rounded-full"></div>
+            </div>
+            <div className="ml-4 text-sm font-medium">
+              Step 1 of 1: Checkout
             </div>
           </div>
         </div>
 
-        <form onSubmit={handlePlaceOrder}>
+        <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+
+        <form onSubmit={handleCheckout}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Shipping Address Section */}
             <div className="lg:col-span-2">
@@ -279,76 +225,6 @@ export default function Checkout() {
                     />
                   </div>
                 </div>
-
-                {/* Payment Section */}
-                <h2 className="text-xl font-medium pt-6">Payment Method</h2>
-
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <input type="radio" id="credit-card" checked readOnly />
-                    <label htmlFor="credit-card">Credit Card</label>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Card Number *
-                    </label>
-                    <input
-                      name="cardNumber"
-                      value={formData.cardNumber}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '');
-                        const formatted =
-                          value.match(/.{1,4}/g)?.join(' ') || '';
-                        setFormData({
-                          ...formData,
-                          cardNumber: formatted.slice(0, 19),
-                        });
-                      }}
-                      placeholder="0000 0000 0000 0000"
-                      className="w-full border rounded-md px-3 py-2"
-                      maxLength={19}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Expiration (MM/YY) *
-                      </label>
-                      <input
-                        name="expDate"
-                        value={formData.expDate}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, '');
-                          const formatted = value
-                            .replace(/^(\d{2})(\d)/, '$1/$2')
-                            .slice(0, 5);
-                          setFormData({ ...formData, expDate: formatted });
-                        }}
-                        placeholder="MM/YY"
-                        className="w-full border rounded-md px-3 py-2"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        CVV *
-                      </label>
-                      <input
-                        name="cvv"
-                        value={formData.cvv}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, '');
-                          setFormData({ ...formData, cvv: value.slice(0, 4) });
-                        }}
-                        className="w-full border rounded-md px-3 py-2"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -406,10 +282,7 @@ export default function Checkout() {
                     {formLoading ? (
                       <span className="animate-pulse">Processing...</span>
                     ) : (
-                      <>
-                        <Lock className="w-4 h-4" />
-                        Place Order
-                      </>
+                      <>Place Order</>
                     )}
                   </button>
                 </div>
@@ -424,7 +297,7 @@ export default function Checkout() {
             isOpen={showConfirmation}
             onClose={() => setShowConfirmation(false)}
             orderDetails={{
-              number: orderDetails.order_number,
+              number: orderDetails.id,
               total: orderDetails.total_amount,
               date: new Date(orderDetails.created_at).toLocaleDateString(),
             }}

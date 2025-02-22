@@ -12,7 +12,7 @@ import ProductDetail from './pages/Products/ProductDetail';
 import Products from './pages/Products/Products';
 import UserDashboard from './pages/UserDashboard/UserDashboard';
 
-export default function App() {
+function App() {
   return (
     <Router>
       <Routes>
@@ -33,3 +33,5 @@ export default function App() {
     </Router>
   );
 }
+
+export default App;
