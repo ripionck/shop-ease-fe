@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import Spinner from '../../components/Spinner';
+import useAuth from '../../hooks/useAuth';
 import AddCategoryModal from './AddCategoryModal';
 import AddProductModal from './AddProductModal';
 import Categories from './Categories';
@@ -11,21 +13,11 @@ import Sidebar from './Sidebar';
 import Transactions from './Transactions';
 import UpdateStockModal from './UpdateStockModal';
 
-const userData = {
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-  avatar: 'https://avatar.iran.liara.run/public',
-  stats: {
-    totalOrders: 12,
-    wishlistItems: 8,
-    totalSpent: 2890,
-  },
-};
-
 export default function AdminDashboard() {
+  const { loading, isLoggedIn, user } = useAuth();
+
   const [activeModal, setActiveModal] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
-  // const location = useLocation(); // Use useLocation to check the current path
 
   const closeModal = () => {
     setActiveModal(null);
@@ -37,15 +29,22 @@ export default function AdminDashboard() {
     setSelectedItem(item);
   };
 
-  // // Redirect to /admin/products if the path is /admin
-  // if (location.pathname === '/admin') {
-  //   return <Navigate to="/admin/products" replace />;
-  // }
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (!isLoggedIn || !user || user.role !== 'admin') {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Left Side - Sidebar */}
-      <Sidebar user={userData} />
+      <Sidebar />
 
       {/* Right Side - Content */}
       <main className="flex-1 p-8">

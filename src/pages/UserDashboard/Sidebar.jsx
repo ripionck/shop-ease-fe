@@ -1,20 +1,25 @@
 import { Heart, SettingsIcon, ShoppingBag, User } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
-export default function Sidebar({ user }) {
+export default function Sidebar() {
+  const { user } = useAuth();
   return (
     <div className="w-64 bg-white shadow-lg p-4">
       {/* User Profile Section */}
       <div className="flex items-center mb-8">
         <img
-          src={user.avatar || 'https://avatar.iran.liara.run/public'}
-          alt="User avatar"
-          className="w-12 h-12 rounded-full mr-3"
+          src={user?.image || 'https://avatar.iran.liara.run/public'}
+          alt="User"
+          className="w-12 h-12 rounded-full mr-3 object-cover"
         />
         <div>
-          <h2 className="font-semibold text-lg">{user.name}</h2>
+          <h2 className="font-semibold text-lg">{user.username}</h2>
           <p className="text-sm text-gray-500">{user.email}</p>
+          <p className="text-xs text-blue-600 mt-1">
+            {user.role === 'admin' ? 'Administrator' : 'Registered User'}
+          </p>
         </div>
       </div>
 

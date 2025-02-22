@@ -18,14 +18,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
           <Route path="featured" element={<Featured />} />
           <Route path="shop" element={<Products />} />
           <Route path="product/:id" element={<ProductDetail />} />
           <Route path="flash-deals" element={<FlashDeals />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
           <Route path="/user/*" element={<UserDashboard />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
         </Route>

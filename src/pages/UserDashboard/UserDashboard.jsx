@@ -1,22 +1,15 @@
 import { Route, Routes } from 'react-router-dom';
-import Sidebar from './Sidebar';
 import Orders from './Orders';
-import Wishlist from './Wishlist';
 import Profile from './Profile';
 import Settings from './Settings';
-
-// Dummy user data
-const userData = {
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-  avatar: 'https://avatar.iran.liara.run/public',
-};
+import Sidebar from './Sidebar';
+import Wishlist from './Wishlist';
 
 export default function UserDashboard() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Left Side - Sidebar */}
-      <Sidebar user={userData} />
+      <Sidebar />
 
       {/* Right Side - Content */}
       <main className="flex-1 p-8">

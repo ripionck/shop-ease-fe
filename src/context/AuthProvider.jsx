@@ -1,6 +1,7 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
+import Spinner from '../components/Spinner';
 import AuthContext from './AuthContext';
 
 const AuthProvider = ({ children }) => {
@@ -9,6 +10,7 @@ const AuthProvider = ({ children }) => {
     accessToken: null,
     isLoggedIn: false,
   });
+  const [loading, setLoading] = useState(true);
 
   const getAccessToken = () => {
     return (
@@ -20,24 +22,24 @@ const AuthProvider = ({ children }) => {
   const fetchUserProfile = async () => {
     try {
       const accessToken = getAccessToken();
-      if (!accessToken) return;
-
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
       const response = await axios.get(
         'http://127.0.0.1:8000/api/v1/profile/',
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        },
+        { headers: { Authorization: `Bearer ${accessToken}` } },
       );
-
-      setAuth((prev) => ({
-        ...prev,
+      setAuth({
         user: response.data,
         accessToken: accessToken,
         isLoggedIn: true,
-      }));
+      });
     } catch (error) {
       console.error('Error fetching profile:', error);
       logout();
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,11 +71,22 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const accessToken = getAccessToken();
-    if (accessToken) fetchUserProfile();
+    if (accessToken) {
+      fetchUserProfile();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ loading, auth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

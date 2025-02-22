@@ -176,9 +176,9 @@ export default function Products() {
                     <div className="flex items-center">
                       {product.images?.length > 0 && (
                         <img
-                          src={product.images[0].image}
+                          src={product.images[0].image_url}
                           alt={product.name}
-                          className="h-10 w-10 flex-shrink-0 rounded-lg mr-4"
+                          className="h-16 w-16 flex-shrink-0 rounded-lg mr-4"
                         />
                       )}
                       {product.name}
