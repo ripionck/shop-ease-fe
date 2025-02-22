@@ -22,7 +22,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   const dashboardPath =
-    auth?.user?.role === 'admin' ? '/admin/analytics' : '/user';
+    auth?.user?.role === 'admin' ? '/admin/products' : '/user/orders';
 
   return (
     <>

@@ -1,48 +1,89 @@
 import { Heart, SettingsIcon, ShoppingBag, User } from 'lucide-react';
+import PropTypes from 'prop-types';
+import { NavLink } from 'react-router-dom';
 
-export default function Sidebar({ user, currentPage, onNavigate }) {
-  const navItems = [
-    { id: 'orders', label: 'Orders', icon: ShoppingBag },
-    { id: 'wishlist', label: 'Wishlist', icon: Heart },
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'settings', label: 'Settings', icon: SettingsIcon },
-  ];
-
+export default function Sidebar({ user }) {
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 p-6">
-      <div className="flex flex-col items-center mb-8">
-        <div className="relative w-24 h-24 mb-4">
-          <img
-            src={user.avatar || '/placeholder.svg'}
-            alt="Profile"
-            className="rounded-full"
-          />
-          <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-4 border-white rounded-full" />
+    <div className="w-64 bg-white shadow-lg p-4">
+      {/* User Profile Section */}
+      <div className="flex items-center mb-8">
+        <img
+          src={user.avatar || 'https://avatar.iran.liara.run/public'}
+          alt="User avatar"
+          className="w-12 h-12 rounded-full mr-3"
+        />
+        <div>
+          <h2 className="font-semibold text-lg">{user.name}</h2>
+          <p className="text-sm text-gray-500">{user.email}</p>
         </div>
-        <h2 className="text-lg font-semibold">{user.name}</h2>
-        <p className="text-sm text-gray-500">{user.email}</p>
       </div>
 
-      <nav className="space-y-1">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.id}
-              onClick={() => onNavigate(item.id)}
-              className={`flex items-center w-full px-4 py-3 text-sm rounded-lg transition-colors
-                ${
-                  currentPage === item.id
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-            >
-              <Icon className="w-5 h-5 mr-3" />
-              {item.label}
-            </button>
-          );
-        })}
+      {/* Navigation Menu */}
+      <nav className="mt-8">
+        <NavLink
+          to="/user/orders"
+          className={({ isActive }) =>
+            `flex items-center p-2 rounded mb-2 ${
+              isActive
+                ? 'bg-blue-100 text-blue-600'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`
+          }
+        >
+          <ShoppingBag className="w-5 h-5 mr-3" />
+          Orders
+        </NavLink>
+
+        <NavLink
+          to="/user/wishlist"
+          className={({ isActive }) =>
+            `flex items-center p-2 rounded mb-2 ${
+              isActive
+                ? 'bg-blue-100 text-blue-600'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`
+          }
+        >
+          <Heart className="w-5 h-5 mr-3" />
+          Wishlist
+        </NavLink>
+
+        <NavLink
+          to="/user/profile"
+          className={({ isActive }) =>
+            `flex items-center p-2 rounded mb-2 ${
+              isActive
+                ? 'bg-blue-100 text-blue-600'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`
+          }
+        >
+          <User className="w-5 h-5 mr-3" />
+          Profile
+        </NavLink>
+
+        <NavLink
+          to="/user/settings"
+          className={({ isActive }) =>
+            `flex items-center p-2 rounded mb-2 ${
+              isActive
+                ? 'bg-blue-100 text-blue-600'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`
+          }
+        >
+          <SettingsIcon className="w-5 h-5 mr-3" />
+          Settings
+        </NavLink>
       </nav>
-    </aside>
+    </div>
   );
 }
+
+Sidebar.propTypes = {
+  user: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    avatar: PropTypes.string.isRequired,
+  }).isRequired,
+};

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import AddCategoryModal from './AddCategoryModal';
 import AddProductModal from './AddProductModal';
-import Analytics from './Analytics';
 import Categories from './Categories';
 import Inventory from './Inventory';
 import OrderDetailsModal from './OrderDetailsModal';
@@ -51,7 +50,6 @@ export default function AdminDashboard() {
       {/* Right Side - Content */}
       <main className="flex-1 p-8">
         <Routes>
-          <Route path="analytics" element={<Analytics />} />
           <Route
             path="products"
             element={<Products onOpenModal={openModal} />}

@@ -1,11 +1,4 @@
-import {
-  Box,
-  ClipboardList,
-  CreditCard,
-  LineChart,
-  List,
-  Package,
-} from 'lucide-react';
+import { Box, ClipboardList, CreditCard, List, Package } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
 
@@ -27,20 +20,6 @@ export default function Sidebar({ user }) {
 
       {/* Navigation Menu */}
       <nav className="mt-8">
-        <NavLink
-          to="/admin/analytics"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded mb-2 ${
-              isActive
-                ? 'bg-blue-100 text-blue-600'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`
-          }
-        >
-          <LineChart className="w-5 h-5 mr-3" />
-          Analytics
-        </NavLink>
-
         <NavLink
           to="/admin/products"
           className={({ isActive }) =>
