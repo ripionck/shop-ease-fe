@@ -272,7 +272,7 @@ export default function Products() {
             setIsImageModalOpen(false);
             setSelectedProductId(null);
           }}
-          productId={selectedProductId}
+          productId={selectedProductId || ''}
           uploadProductImage={uploadProductImage}
         />
       )}

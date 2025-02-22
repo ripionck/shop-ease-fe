@@ -113,18 +113,10 @@ export const ProductsProvider = ({ children }) => {
     }
   };
 
-  const uploadProductImage = async (productId, imageFile, isMain = false) => {
-    if (!verifyAdmin()) return;
-
-    setError(null);
-    setLoading(true);
+  const uploadProductImage = async (productId, formData) => {
     try {
-      const formData = new FormData();
-      formData.append('image', imageFile);
-      formData.append('is_main', isMain);
-
       const response = await api.post(
-        `products/${productId}/images/`,
+        `/products/${productId}/images/`,
         formData,
         {
           headers: {
@@ -132,22 +124,10 @@ export const ProductsProvider = ({ children }) => {
           },
         },
       );
-
-      setProducts((prev) => ({
-        ...prev,
-        results: prev.results.map((product) =>
-          product.id === productId
-            ? {
-                ...product,
-                images: [...(product.images || []), response.data],
-              }
-            : product,
-        ),
-      }));
-    } catch (err) {
-      handleError(err, 'Failed to upload product image');
-    } finally {
-      setLoading(false);
+      return response.data;
+    } catch (error) {
+      console.error('Image upload error:', error.response?.data);
+      throw error;
     }
   };
 
