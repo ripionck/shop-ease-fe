@@ -11,12 +11,14 @@ import {
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import useCart from '../../hooks/useCart';
 import SearchModal from '../SearchModal';
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { auth, login, logout } = useAuth();
+  const { auth, logout } = useAuth();
+  const { cartItems } = useCart();
   const navigate = useNavigate();
 
   const dashboardPath =
@@ -70,61 +72,61 @@ export default function Header() {
                 <Search className="w-6 h-6" />
               </button>
 
-              {login && (
-                <Link
-                  to="/cart"
-                  className="text-gray-700 hover:text-indigo-600"
-                >
-                  <div className="relative">
-                    <ShoppingCart className="w-6 h-6" />
-                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">
-                      3
-                    </span>
-                  </div>
-                </Link>
-              )}
-
-              {login ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="text-gray-700 hover:text-indigo-600 relative"
+              {auth?.isLoggedIn ? (
+                <>
+                  <Link
+                    to="/cart"
+                    className="text-gray-700 hover:text-indigo-600"
                   >
-                    {auth?.image ? (
-                      <img
-                        src={auth.image}
-                        alt="Profile"
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                        <User className="w-5 h-5 text-gray-500" />
+                    <div className="relative">
+                      <ShoppingCart className="w-6 h-6" />
+                      <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">
+                        {cartItems.length}
+                      </span>
+                    </div>
+                  </Link>
+
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
+                      className="text-gray-700 hover:text-indigo-600 relative"
+                    >
+                      {auth?.user?.image ? (
+                        <img
+                          src={auth.user.image}
+                          alt="Profile"
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                          <User className="w-5 h-5 text-gray-500" />
+                        </div>
+                      )}
+                    </button>
+
+                    {isProfileOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
+                        <Link
+                          to={dashboardPath}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                        <button
+                          onClick={() => {
+                            logout();
+                            navigate('/login');
+                            setIsProfileOpen(false);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Logout
+                        </button>
                       </div>
                     )}
-                  </button>
-
-                  {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
-                      <Link
-                        to={dashboardPath}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
-                      <button
-                        onClick={() => {
-                          logout();
-                          navigate('/login');
-                          setIsProfileOpen(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                </>
               ) : (
                 <Link
                   to="/login"

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import RegisterForm from './RegisterForm';
 
 export default function Register() {
@@ -24,6 +25,7 @@ export default function Register() {
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match.');
+      toast.error('Passwords do not match.');
       return;
     }
 
@@ -44,12 +46,15 @@ export default function Register() {
 
       if (!response.ok) {
         setError(data.message || 'Registration failed.');
+        toast.error(data.message || 'Registration failed.');
       } else {
         setSuccess(true);
+        toast.success('User registered successfully!');
         setError('');
       }
     } catch (err) {
       setError('An unexpected error occurred.');
+      toast.error('An unexpected error occurred.');
       console.error(err);
     }
   };

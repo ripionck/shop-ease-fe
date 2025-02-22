@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { toast } from 'react-toastify';
 import useAuth from '../../hooks/useAuth';
 import LoginForm from './LoginForm';
 
@@ -37,6 +37,7 @@ export default function Login() {
 
       const { access, refresh } = response.data;
       login({ access, refresh }, formData.rememberMe);
+      toast.success('Login successful!');
       navigate('/');
     } catch (err) {
       let errorMessage = 'An unexpected error occurred. Please try again.';
@@ -45,6 +46,7 @@ export default function Login() {
           err.response.data.detail || err.response.data.message || errorMessage;
       }
       setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

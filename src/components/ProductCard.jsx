@@ -1,42 +1,19 @@
-import axios from 'axios';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
+import useCart from '../hooks/useCart';
 
 const ProductCard = ({ product, viewMode, onAddToWishlist }) => {
+  const { addToCart, loading } = useCart();
+
   const handleAddToCart = async () => {
-    const accessToken = localStorage.getItem('access_token');
-
-    if (!accessToken) {
-      toast.error('You must be logged in to add items to the cart');
-      return;
-    }
-
     try {
-      const response = await axios.post(
-        'http://127.0.0.1:8000/api/v1/cart/add/',
-        {
-          product_id: product.id,
-          quantity: 1,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-
-      if (response.data.success) {
+      const success = await addToCart(product.id, 1);
+      if (success) {
         toast.success(`${product.name} added to cart!`);
-      } else {
-        throw new Error(
-          response.data.message || 'Failed to add product to cart',
-        );
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || 'Failed to add product to cart';
-      toast.error(errorMessage);
+      toast.error(error.message);
     }
   };
 
@@ -88,7 +65,8 @@ const ProductCard = ({ product, viewMode, onAddToWishlist }) => {
           </span>
           <button
             onClick={handleAddToCart}
-            className="p-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer transition-colors"
+            disabled={loading}
+            className="p-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer transition-colors disabled:opacity-50"
           >
             <ShoppingCart className="w-5 h-5" />
           </button>

@@ -1,47 +1,28 @@
-import axios from 'axios';
 import { Lock, Minus, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Spinner from '../components/Spinner';
+import useCart from '../hooks/useCart';
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState([]);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const {
+    cartItems,
+    loading: cartLoading,
+    error: cartError,
+    fetchCart,
+    updateCartItem,
+    removeFromCart,
+  } = useCart();
+
   const [isUpdating, setIsUpdating] = useState(false);
   const [updatingId, setUpdatingId] = useState(null);
-  const [error, setError] = useState('');
   const [promoCode, setPromoCode] = useState('');
-
-  // Get access token from localStorage
-  const getAccessToken = () => localStorage.getItem('access_token');
 
   // Handle unauthorized errors
   const handleUnauthorized = () => {
     localStorage.removeItem('access_token');
     window.location.href = '/login';
-  };
-
-  // Fetch cart data
-  const fetchCart = async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:8000/api/v1/cart/', {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
-      setCartItems(response.data.cart.products || []);
-      setError('');
-    } catch (error) {
-      if (error.response?.status === 401) {
-        handleUnauthorized();
-      } else {
-        setError('Failed to load cart items');
-        toast.error(error.response?.data?.message || 'Error loading cart');
-      }
-    } finally {
-      setInitialLoading(false);
-    }
   };
 
   // Update item quantity
@@ -50,26 +31,13 @@ export default function Cart() {
       setIsUpdating(true);
       setUpdatingId(productId);
 
-      // Optimistic update
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.id === productId ? { ...item, quantity: newQuantity } : item,
-        ),
-      );
-
-      await axios.patch(
-        `http://127.0.0.1:8000/api/v1/cart/update/${productId}/`,
-        { quantity: newQuantity },
-        { headers: { Authorization: `Bearer ${getAccessToken()}` } },
-      );
-
+      await updateCartItem(productId, newQuantity);
       toast.success('Quantity updated successfully');
     } catch (error) {
       if (error.response?.status === 401) {
         handleUnauthorized();
       } else {
         toast.error(error.response?.data?.message || 'Error updating quantity');
-        await fetchCart(); // Revert on error
       }
     } finally {
       setIsUpdating(false);
@@ -83,21 +51,13 @@ export default function Cart() {
       setIsUpdating(true);
       setUpdatingId(productId);
 
-      // Optimistic update
-      setCartItems((prev) => prev.filter((item) => item.id !== productId));
-
-      await axios.delete(
-        `http://127.0.0.1:8000/api/v1/cart/remove/${productId}/`,
-        { headers: { Authorization: `Bearer ${getAccessToken()}` } },
-      );
-
+      await removeFromCart(productId);
       toast.success('Item removed from cart');
     } catch (error) {
       if (error.response?.status === 401) {
         handleUnauthorized();
       } else {
         toast.error(error.response?.data?.message || 'Error removing item');
-        await fetchCart(); // Revert on error
       }
     } finally {
       setIsUpdating(false);
@@ -113,25 +73,22 @@ export default function Cart() {
   const shipping = 9.99;
   const total = subtotal + shipping;
 
+  // Fetch cart data on mount
   useEffect(() => {
-    if (!getAccessToken()) {
-      window.location.href = '/login';
-      return;
-    }
     fetchCart();
-  }, []);
+  }, [fetchCart]);
 
-  if (initialLoading)
+  if (cartLoading)
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Spinner />
       </div>
     );
 
-  if (error) {
+  if (cartError) {
     return (
       <div className="min-h-screen bg-gray-50 py-8 flex justify-center items-center">
-        <div className="text-red-500">{error}</div>
+        <div className="text-red-500">{cartError}</div>
       </div>
     );
   }
@@ -179,7 +136,7 @@ export default function Cart() {
                                 Math.max(1, item.quantity - 1),
                               )
                             }
-                            className="p-2 hover:bg-gray-50 w-10 flex items-center justify-center"
+                            className="p-2 hover:bg-gray-50 w-10 flex items-center justify-center cursor-pointer"
                             disabled={isUpdating}
                           >
                             {isItemUpdating ? (
@@ -193,7 +150,7 @@ export default function Cart() {
                             onClick={() =>
                               handleUpdateQuantity(item.id, item.quantity + 1)
                             }
-                            className="p-2 hover:bg-gray-50 w-10 flex items-center justify-center"
+                            className="p-2 hover:bg-gray-50 w-10 flex items-center justify-center cursor-pointer"
                             disabled={isUpdating}
                           >
                             {isItemUpdating ? (
@@ -206,7 +163,7 @@ export default function Cart() {
 
                         <button
                           onClick={() => handleRemoveItem(item.id)}
-                          className="text-red-500 hover:text-red-600 w-10 flex items-center justify-center"
+                          className="text-red-500 hover:text-red-600 w-10 flex items-center justify-center cursor-pointer"
                           disabled={isUpdating}
                         >
                           {isItemUpdating ? (
