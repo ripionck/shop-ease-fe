@@ -54,7 +54,7 @@ const Products = () => {
         console.log('Sending Params:', params.toString()); // Debugging log
 
         const response = await axios.get(
-          'http://127.0.0.1:8000/api/v1/products/',
+          'https://shop-ease-3oxf.onrender.com/api/v1/products/',
           {
             params: params,
           },
@@ -120,7 +120,7 @@ const Products = () => {
     }
     try {
       await axios.post(
-        'http://127.0.0.1:8000/api/v1/wishlist/add/',
+        'https://shop-ease-3oxf.onrender.com/v1/wishlist/add/',
         { product_id: productId },
         { headers: { Authorization: `Bearer ${auth.accessToken}` } },
       );

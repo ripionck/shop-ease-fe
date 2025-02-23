@@ -25,11 +25,14 @@ const ProductDetails = () => {
     const fetchProductData = async () => {
       try {
         const [productResponse, reviewsResponse] = await Promise.all([
-          axios.get(`http://localhost:8000/api/v1/products/${productId}/`, {
-            signal,
-          }),
           axios.get(
-            `http://localhost:8000/api/v1/products/${productId}/reviews/`,
+            `https://shop-ease-3oxf.onrender.com/api/v1/products/${productId}/`,
+            {
+              signal,
+            },
+          ),
+          axios.get(
+            `https://shop-ease-3oxf.onrender.com/api/v1/products/${productId}/reviews/`,
             { signal },
           ),
         ]);

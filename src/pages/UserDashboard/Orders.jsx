@@ -7,7 +7,7 @@ import Spinner from '../../components/Spinner';
 const getAccessToken = () => localStorage.getItem('access_token');
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api/v1/',
+  baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
   headers: {
     Authorization: `Bearer ${getAccessToken()}`,
   },
@@ -21,15 +21,14 @@ export default function Orders() {
   const [totalPages, setTotalPages] = useState(1);
   const ordersPerPage = 5;
 
-  // Fetch orders from the backend
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await api.get('/orders/', {
           params: { page: currentPage, page_size: ordersPerPage },
         });
-        setOrders(response.data.orders); // Use `orders` key from the response
-        setTotalPages(Math.ceil(response.data.orders.length / ordersPerPage)); // Adjust based on response
+        setOrders(response.data.orders);
+        setTotalPages(Math.ceil(response.data.orders.length / ordersPerPage));
       } catch (err) {
         handleError(err);
       } finally {
@@ -40,7 +39,6 @@ export default function Orders() {
     fetchOrders();
   }, [currentPage]);
 
-  // Handle errors
   const handleError = (err) => {
     if (err.response?.status === 401) {
       window.location.href = '/login';
@@ -50,12 +48,10 @@ export default function Orders() {
     }
   };
 
-  // Handle pagination
   const handlePageChange = (page) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
 
-  // Cancel an order
   const handleCancelOrder = async (orderId) => {
     try {
       await api.patch(`/orders/${orderId}/cancel/`);

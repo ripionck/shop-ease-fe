@@ -15,12 +15,12 @@ export default function Categories() {
 
   // Public API instance for GET requests
   const publicApi = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/v1/',
+    baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
   });
 
   // Authenticated API instance for write operations
   const authApi = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/v1/',
+    baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
     headers: {
       Authorization: `Bearer ${auth?.accessToken}`,
     },

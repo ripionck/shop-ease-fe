@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 const accessToken = localStorage.getItem('access_token');
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api/v1/',
+  baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
   headers: {
     Authorization: `Bearer ${accessToken}`,
   },
@@ -59,13 +59,11 @@ export default function Orders({ onOpenModal }) {
     setStats({ newOrders, processing, shipped, delivered });
   };
 
-  // Handle fetch errors
   const handleFetchError = (err) => {
     setError(err.response?.data?.message || 'Failed to fetch orders');
     toast.error('Failed to fetch orders');
   };
 
-  // Fetch orders on component mount
   useEffect(() => {
     fetchOrders();
   }, []);

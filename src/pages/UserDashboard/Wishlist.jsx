@@ -12,7 +12,7 @@ export default function Wishlist() {
     const fetchWishlist = async () => {
       try {
         const response = await axios.get(
-          'http://127.0.0.1:8000/api/v1/wishlist/',
+          'https://shop-ease-3oxf.onrender.com/api/v1/wishlist/',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -32,7 +32,7 @@ export default function Wishlist() {
   const handleRemoveFromWishlist = async (productId) => {
     try {
       await axios.delete(
-        `http://127.0.0.1:8000/api/v1/wishlist/remove/${productId}/`,
+        `https://shop-ease-3oxf.onrender.com/api/v1/wishlist/remove/${productId}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
