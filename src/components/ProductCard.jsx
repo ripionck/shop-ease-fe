@@ -62,8 +62,8 @@ const ProductCard = ({ product, viewMode, onAddToWishlist }) => {
               }`}
             />
           ))}
-          <span className="text-sm text-gray-500">
-            ({product.reviews?.length || 0} reviews)
+          <span className="text-sm bg-gray-200 px-2 py-0.5 rounded-full text-gray-500">
+            {product.rating}
           </span>
         </div>
 

@@ -27,9 +27,7 @@ const ProductDetails = () => {
         const [productResponse, reviewsResponse] = await Promise.all([
           axios.get(
             `https://shop-ease-3oxf.onrender.com/api/v1/products/${productId}/`,
-            {
-              signal,
-            },
+            { signal },
           ),
           axios.get(
             `https://shop-ease-3oxf.onrender.com/api/v1/products/${productId}/reviews/`,
@@ -61,11 +59,18 @@ const ProductDetails = () => {
     try {
       const success = await addToCart(productId, 1);
       if (success) {
-        toast.success('Added to cart:', productData.id, quantity);
+        toast.success('Added to cart');
       }
     } catch (error) {
       console.error('Cart error:', error);
     }
+  };
+
+  const handleAddReview = (newReview) => {
+    setProductData((prev) => ({
+      ...prev,
+      reviews: [newReview, ...prev.reviews],
+    }));
   };
 
   if (loading) {
@@ -103,7 +108,6 @@ const ProductDetails = () => {
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Image Gallery */}
         <div className="space-y-4">
           <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
             <img
@@ -134,7 +138,6 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        {/* Product Information */}
         <ProductInfo
           product={productData}
           quantity={quantity}
@@ -143,11 +146,11 @@ const ProductDetails = () => {
         />
       </div>
 
-      {/* Product Tabs */}
       <ProductTabs
         product={productData}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        onReviewAdded={handleAddReview}
       />
     </div>
   );
