@@ -1,5 +1,4 @@
 import { Box, ClipboardList, CreditCard, List, Package } from 'lucide-react';
-import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
@@ -99,16 +98,3 @@ export default function Sidebar() {
     </div>
   );
 }
-
-Sidebar.propTypes = {
-  user: PropTypes.shape({
-    username: PropTypes.string,
-    email: PropTypes.string,
-    image: PropTypes.string,
-    role: PropTypes.oneOf(['admin', 'user']),
-  }),
-};
-
-Sidebar.defaultProps = {
-  user: null,
-};

@@ -29,7 +29,6 @@ const ProductFilters = ({
           <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
         </div>
       </div>
-
       {/* Categories Filter */}
       <div>
         <h3 className="font-medium mb-4">Categories</h3>
@@ -38,8 +37,8 @@ const ProductFilters = ({
             <label key={category.id} className="flex items-center">
               <input
                 type="checkbox"
-                checked={selectedCategories.includes(category.name)}
-                onChange={() => onCategoryChange(category.name)}
+                checked={selectedCategories.includes(category.id)}
+                onChange={() => onCategoryChange(category.id)}
                 className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
               <span className="ml-2 text-gray-600">{category.name}</span>
@@ -50,7 +49,6 @@ const ProductFilters = ({
           ))}
         </div>
       </div>
-
       {/* Price Filter */}
       <div>
         <h3 className="font-medium mb-4">Price Range</h3>
@@ -87,7 +85,6 @@ const ProductFilters = ({
           </div>
         </div>
       </div>
-
       {/* Ratings Filter */}
       <div>
         <h3 className="font-medium mb-4">Ratings</h3>
@@ -116,7 +113,7 @@ const ProductFilters = ({
           ))}
         </div>
       </div>
-
+      {/* Clear Filters Button */}
       <button
         onClick={onClearFilters}
         className="w-full py-2 text-gray-600 border rounded-lg hover:bg-gray-50"

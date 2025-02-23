@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-const getAccessToken = () => localStorage.getItem('access_token');
+const accessToken = localStorage.getItem('access_token');
 
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api/v1/',
   headers: {
-    Authorization: `Bearer ${getAccessToken()}`,
+    Authorization: `Bearer ${accessToken}`,
   },
 });
 
@@ -34,7 +34,7 @@ export default function Orders({ onOpenModal }) {
     try {
       const response = await api.get('/orders/');
       setOrders(response.data.orders);
-      setFilteredOrders(response.data.orders); // Initialize filtered orders
+      setFilteredOrders(response.data.orders);
       calculateStats(response.data.orders);
     } catch (err) {
       handleFetchError(err);

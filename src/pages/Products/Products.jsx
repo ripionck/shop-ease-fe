@@ -7,8 +7,10 @@ import ProductCard from '../../components/ProductCard';
 import ProductFilters from '../../components/ProductFilters';
 import Spinner from '../../components/Spinner';
 import useAuth from '../../hooks/useAuth';
+import useCategories from '../../hooks/useCategories';
 
 const Products = () => {
+  const { categories } = useCategories();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
@@ -16,69 +18,68 @@ const Products = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('featured');
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const productsPerPage = 9;
-
   const { auth } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsResponse, categoriesResponse] = await Promise.all([
-          axios.get('http://127.0.0.1:8000/api/v1/products/'),
-          axios.get('http://127.0.0.1:8000/api/v1/categories/'),
-        ]);
+        const params = new URLSearchParams();
 
-        setProducts(productsResponse.data.results.products);
-        setCategories(categoriesResponse.data.categories);
+        if (searchTerm) params.append('search', searchTerm);
+
+        // Append categories (adjust based on backend expectations)
+        if (selectedCategories.length > 0) {
+          selectedCategories.forEach((category) =>
+            params.append('category[]', category),
+          );
+        }
+
+        params.append('min_price', priceRange[0]);
+        params.append('max_price', priceRange[1]);
+
+        if (selectedRatings.length > 0) {
+          selectedRatings.forEach((rating) =>
+            params.append('rating[]', rating),
+          );
+        }
+
+        params.append('sort', sortBy);
+        params.append('page', currentPage);
+
+        console.log('Sending Params:', params.toString()); // Debugging log
+
+        const response = await axios.get(
+          'http://127.0.0.1:8000/api/v1/products/',
+          {
+            params: params,
+          },
+        );
+
+        setProducts(response.data.results.products);
+        setTotalPages(Math.ceil(response.data.count / productsPerPage));
       } catch (error) {
         setError(error.message);
         console.error('Error fetching data:', error);
+        toast.error('Failed to fetch products. Please try again.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
-
-  const filteredProducts = products
-    .filter((product) => {
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const matchesCategory =
-        selectedCategories.length === 0 ||
-        selectedCategories.includes(product.category);
-      const matchesRating =
-        selectedRatings.length === 0 ||
-        selectedRatings.includes(Math.floor(product.rating));
-      const matchesPrice =
-        product.price >= priceRange[0] && product.price <= priceRange[1];
-      return matchesSearch && matchesCategory && matchesRating && matchesPrice;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'price-low-high':
-          return a.price - b.price;
-        case 'price-high-low':
-          return b.price - a.price;
-        case 'rating':
-          return b.rating - a.rating;
-        default:
-          return 0;
-      }
-    });
-
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const startIndex = (currentPage - 1) * productsPerPage;
-  const paginatedProducts = filteredProducts.slice(
-    startIndex,
-    startIndex + productsPerPage,
-  );
+  }, [
+    currentPage,
+    searchTerm,
+    selectedCategories,
+    priceRange,
+    selectedRatings,
+    sortBy,
+  ]);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -92,7 +93,7 @@ const Products = () => {
         ? prev.filter((c) => c !== category)
         : [...prev, category],
     );
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset pagination when filters change
   };
 
   const handleRatingChange = (rating) => {
@@ -101,7 +102,7 @@ const Products = () => {
         ? prev.filter((r) => r !== rating)
         : [...prev, rating],
     );
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset pagination when filters change
   };
 
   const handleClearFilters = () => {
@@ -114,10 +115,9 @@ const Products = () => {
 
   const handleAddToWishlist = async (productId) => {
     if (!auth.accessToken) {
-      toast.error(error.message || 'Please log in to use wishlist.');
+      toast.error('Please log in to use wishlist.');
       return;
     }
-
     try {
       await axios.post(
         'http://127.0.0.1:8000/api/v1/wishlist/add/',
@@ -127,7 +127,9 @@ const Products = () => {
       toast.success('Added to wishlist!');
     } catch (error) {
       console.error('Error adding to wishlist:', error);
-      toast.error(error.message || 'Failed to add to wishlist.');
+      toast.error(
+        error.response?.data?.message || 'Failed to add to wishlist.',
+      );
     }
   };
 
@@ -153,7 +155,6 @@ const Products = () => {
         <span className="text-gray-400">/</span>
         <span className="text-gray-900">All Products</span>
       </nav>
-
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <ProductFilters
           searchTerm={searchTerm}
@@ -167,7 +168,6 @@ const Products = () => {
           onRatingChange={handleRatingChange}
           onClearFilters={handleClearFilters}
         />
-
         <div className="lg:col-span-3 mt-10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
@@ -201,7 +201,6 @@ const Products = () => {
               </button>
             </div>
           </div>
-
           <div
             className={
               viewMode === 'grid'
@@ -209,12 +208,12 @@ const Products = () => {
                 : 'space-y-6'
             }
           >
-            {paginatedProducts.length === 0 ? (
+            {products.length === 0 ? (
               <div className="text-center py-8 text-gray-600">
                 No products found
               </div>
             ) : (
-              paginatedProducts.map((product) => (
+              products.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
@@ -224,7 +223,6 @@ const Products = () => {
               ))
             )}
           </div>
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

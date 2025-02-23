@@ -31,7 +31,7 @@ const ProductCard = ({ product, viewMode, onAddToWishlist }) => {
         <img
           src={product.images?.[0]?.image_url || '/placeholder.svg'}
           alt={product.name}
-          className="w-full h-48 object-cover"
+          className="w-full h-48"
         />
         <button
           onClick={(e) => {
