@@ -238,7 +238,7 @@ export default function Checkout() {
                     <div key={item.id} className="flex gap-4 items-center">
                       <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
                         <img
-                          src={item.thumbnail}
+                          src={item.image}
                           alt={item.name}
                           className="w-12 h-12 object-contain"
                         />

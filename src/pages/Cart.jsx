@@ -111,7 +111,7 @@ export default function Cart() {
                   >
                     <div className="w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center">
                       <img
-                        src={item.thumbnail || '/placeholder.svg'}
+                        src={item.image || '/placeholder.svg'}
                         alt={item.name}
                         className="w-16 h-16 object-contain"
                       />

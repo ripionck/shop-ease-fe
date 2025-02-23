@@ -67,7 +67,7 @@ export default function Header() {
             <div className="flex items-center space-x-6">
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="text-gray-700 hover:text-indigo-600"
+                className="text-gray-700 hover:text-indigo-600 cursor-pointer"
               >
                 <Search className="w-6 h-6" />
               </button>
@@ -89,7 +89,7 @@ export default function Header() {
                   <div className="relative">
                     <button
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="text-gray-700 hover:text-indigo-600 relative"
+                      className="text-gray-700 hover:text-indigo-600 relative cursor-pointer"
                     >
                       {auth?.user?.image ? (
                         <img
