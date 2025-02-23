@@ -49,13 +49,13 @@ export default function HeroSection() {
               <div className="space-y-4">
                 <div className="bg-white p-6 rounded-lg shadow-lg">
                   <img
-                    src="/src/assets/computer.jpg"
+                    src="/images/computer.jpg"
                     className="w-full h-40 mb-4"
                   />
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-lg">
                   <img
-                    src="/src/assets/photography.jpg"
+                    src="/images/photography.jpg"
                     className="w-full h-40 mb-4"
                   />
                 </div>
@@ -63,14 +63,14 @@ export default function HeroSection() {
               <div className="space-y-4 mt-8">
                 <div className="bg-white p-6 rounded-lg shadow-lg">
                   <img
-                    src="/src/assets/network.jpg"
+                    src="/images/network.jpg"
                     alt="Networking"
                     className="w-full h-40 mb-4"
                   />
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-lg">
                   <img
-                    src="/src/assets/smartphones.jpg"
+                    src="/images/smartphones.jpg"
                     alt="Smartphones"
                     className="w-full h-40 mb-4"
                   />

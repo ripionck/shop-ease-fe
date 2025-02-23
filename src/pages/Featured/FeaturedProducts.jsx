@@ -11,7 +11,7 @@ const products = [
     rating: 4,
     reviews: 124,
     discount: '-20%',
-    image: '/src/assets/Wireless-Headphones.jpg',
+    image: '/images/Wireless-Headphones.jpg',
     isNew: false,
     isHot: false,
   },
@@ -24,7 +24,7 @@ const products = [
     reviews: 89,
     isNew: true,
     isHot: false,
-    image: '/src/assets/Ultra-Laptop-Pro.jpg',
+    image: '/images/Ultra-Laptop-Pro.jpg',
   },
   {
     id: 3,
@@ -35,7 +35,7 @@ const products = [
     reviews: 246,
     isNew: false,
     isHot: false,
-    image: '/src/assets/Smart-Phone-X.jpg',
+    image: '/images/Smart-Phone-X.jpg',
   },
   {
     id: 4,
@@ -47,7 +47,7 @@ const products = [
     reviews: 167,
     isNew: false,
     isHot: true,
-    image: '/src/assets/Smart-Watch-Pro.jpg',
+    image: '/images/Smart-Watch-Pro.jpg',
   },
 ];
 

@@ -1,12 +1,11 @@
 import { ShoppingCart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-// Dummy data for flash deals
 const flashDeals = [
   {
     id: 1,
     name: 'Premium Laptop',
-    image: '/src/assets/Premium-Laptop.jpg',
+    image: '/images/Premium-Laptop.jpg',
     price: 899,
     originalPrice: 1499,
     discount: '-40%',
@@ -14,7 +13,7 @@ const flashDeals = [
   {
     id: 2,
     name: 'Wireless Headphones',
-    image: '/src/assets/Wireless-Headphone.jpg',
+    image: '/images/Wireless-Headphone.jpg',
     price: 149,
     originalPrice: 299,
     discount: '-50%',
@@ -22,7 +21,7 @@ const flashDeals = [
   {
     id: 3,
     name: 'Smartphone Pro',
-    image: '/src/assets/Smartphone-Pro.jpg',
+    image: '/images/Smartphone-Pro.jpg',
     price: 699,
     originalPrice: 999,
     discount: '-30%',

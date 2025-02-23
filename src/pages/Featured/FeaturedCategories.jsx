@@ -5,37 +5,37 @@ const categories = [
     id: '1',
     name: 'Computers',
     description: 'Desktops, Laptops & Components',
-    cover: '/src/assets/computer.jpg',
+    cover: '/images/computer.jpg',
   },
   {
     id: '2',
     name: 'Accessories',
     description: 'PC Peripherals & Gadgets',
-    cover: '/src/assets/accessories.jpg',
+    cover: '/images/accessories.jpg',
   },
   {
     id: '3',
     name: 'Gaming',
     description: 'Consoles & Gaming Gear',
-    cover: '/src/assets/gaming.jpg',
+    cover: '/images/gaming.jpg',
   },
   {
     id: '4',
     name: 'Photography',
     description: 'Cameras & Equipment',
-    cover: '/src/assets/photography.jpg',
+    cover: '/images/photography.jpg',
   },
   {
     id: '5',
     name: 'Smartphones',
     description: 'Latest Models & Accessories',
-    cover: '/src/assets/smartphones.jpg',
+    cover: '/images/smartphones.jpg',
   },
   {
     id: '6',
     name: 'Networking',
     description: 'Routers & Connectivity',
-    cover: '/src/assets/network.jpg',
+    cover: '/images/network.jpg',
   },
 ];
 
