@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CreditCard, Trash } from 'lucide-react';
+import { Camera, CreditCard, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import EditAddressModal from './EditAddressModal';
@@ -24,6 +24,7 @@ export default function Profile() {
     country: '',
     zip_code: '',
     image: null,
+    created_at: '',
   });
   const [showEditAddressModal, setShowEditAddressModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -43,6 +44,7 @@ export default function Profile() {
           country,
           zip_code,
           image,
+          created_at,
         } = response.data;
         setProfile({
           username,
@@ -54,6 +56,7 @@ export default function Profile() {
           country,
           zip_code,
           image,
+          created_at,
         });
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch profile');
@@ -119,6 +122,34 @@ export default function Profile() {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await api.patch('/profile/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setProfile({
+        ...profile,
+        image: response.data.image,
+      });
+      toast.success('Profile image updated successfully');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to upload image');
+    }
+  };
+
+  const dateObject = new Date(profile.created_at);
+
+  const options = { year: 'numeric', month: 'long' };
+  const formattedDate = dateObject.toLocaleDateString('en-US', options);
+
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -130,7 +161,7 @@ export default function Profile() {
     return <div className="text-center p-8 text-red-600">Error: {error}</div>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-8">
+    <div className="max-w-5xl mx-auto p-6 space-y-8">
       {/* Profile Header */}
       <div className="flex items-start gap-6">
         <div className="relative">
@@ -139,13 +170,19 @@ export default function Profile() {
             alt="Profile"
             className="w-24 h-24 rounded-full"
           />
-          <button className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-2 bg-indigo-500 text-white text-sm rounded-lg hover:bg-indigo-600">
-            Change Photo
-          </button>
+          <label className="absolute -bottom-2 left-1/2 -translate-x-1/2 cursor-pointer">
+            <Camera />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </label>
         </div>
         <div>
           <h1 className="text-2xl font-semibold">{profile.username}</h1>
-          <p className="text-gray-500">Member since October 2023</p>
+          <p className="text-gray-500">Member since {formattedDate}</p>
         </div>
       </div>
 

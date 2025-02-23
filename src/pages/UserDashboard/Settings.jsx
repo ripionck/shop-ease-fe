@@ -1,4 +1,4 @@
-import { Lock, Trash2, Bell, Moon, Globe } from 'lucide-react';
+import { Bell, Globe, Lock, Moon, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Settings() {
@@ -6,7 +6,7 @@ export default function Settings() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-8">
+    <div className="max-w-5xl mx-auto p-6 space-y-8">
       <h1 className="text-2xl font-semibold">Settings</h1>
 
       {/* Change Password */}
