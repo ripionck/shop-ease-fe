@@ -79,20 +79,20 @@ export default function Wishlist() {
             <p className="text-gray-600 mb-4">${item.price}</p>
             <div className="flex justify-between items-center">
               <span
-                className={`text-sm ${
-                  item.inStock ? 'text-green-600' : 'text-red-600'
+                className={`text-sm bg-gray-200 px-2 py-0.5 rounded-full ${
+                  item.is_active ? 'text-green-600' : 'text-red-600'
                 }`}
               >
-                {item.inStock ? 'In Stock' : 'Out of Stock'}
+                {item.is_active ? 'In Stock' : 'Out of Stock'}
               </span>
               <button
                 className={`flex items-center px-4 py-2 rounded-lg text-sm
                   ${
-                    item.inStock
+                    item.is_active
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
-                disabled={!item.inStock}
+                disabled={!item.is_active}
               >
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 Add to Cart
