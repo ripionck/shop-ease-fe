@@ -1,4 +1,4 @@
-```markdown
+
 # ShopEase
 
 A modern e-commerce frontend built with React, designed to interact with the [ShopEase API](https://shop-ease-3oxf.onrender.com/api/v1/). Manage products, wishlists, carts, orders, and payments seamlessly with a user-friendly interface.
