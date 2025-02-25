@@ -29,35 +29,32 @@ const Products = () => {
     const fetchData = async () => {
       try {
         const params = new URLSearchParams();
-
         if (searchTerm) params.append('search', searchTerm);
 
-        // Append categories (adjust based on backend expectations)
+        // Append categories
         if (selectedCategories.length > 0) {
           selectedCategories.forEach((category) =>
             params.append('category[]', category),
           );
         }
 
+        // Append price range
         params.append('min_price', priceRange[0]);
         params.append('max_price', priceRange[1]);
 
+        // Append ratings as a comma-separated string
         if (selectedRatings.length > 0) {
-          selectedRatings.forEach((rating) =>
-            params.append('rating[]', rating),
-          );
+          params.append('rating', selectedRatings.join(','));
         }
 
+        // Append sort and page
         params.append('sort', sortBy);
         params.append('page', currentPage);
 
-        console.log('Sending Params:', params.toString()); // Debugging log
-
+        console.log('Sending Params:', params.toString());
         const response = await axios.get(
           'https://shop-ease-3oxf.onrender.com/api/v1/products/',
-          {
-            params: params,
-          },
+          { params: params },
         );
 
         setProducts(response.data.results.products);
@@ -70,7 +67,6 @@ const Products = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [
     currentPage,
