@@ -56,7 +56,7 @@ const Products = () => {
           'https://shop-ease-3oxf.onrender.com/api/v1/products/',
           { params: params },
         );
-        setProducts(response.data.results.products);
+        setProducts(response.data.products);
 
         setTotalPages(Math.ceil(response.data.count / productsPerPage));
       } catch (error) {
