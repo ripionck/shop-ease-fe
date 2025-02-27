@@ -38,12 +38,13 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Error fetching profile:', error);
       logout();
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const login = (tokens, rememberMe) => {
+  const login = async (tokens, rememberMe) => {
     const storage = rememberMe ? localStorage : sessionStorage;
     storage.setItem('access_token', tokens.access);
     storage.setItem('refresh_token', tokens.refresh);
@@ -54,7 +55,7 @@ const AuthProvider = ({ children }) => {
       isLoggedIn: true,
     }));
 
-    fetchUserProfile();
+    await fetchUserProfile();
   };
 
   const logout = () => {
@@ -85,6 +86,7 @@ const AuthProvider = ({ children }) => {
       </div>
     );
   }
+
   return (
     <AuthContext.Provider
       value={{

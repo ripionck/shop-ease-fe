@@ -37,9 +37,8 @@ export default function Login() {
           password: formData.password,
         },
       );
-
       const { access, refresh } = response.data;
-      login({ access, refresh }, formData.rememberMe);
+      await login({ access, refresh }, formData.rememberMe);
       toast.success('Login successful!');
       navigate('/');
     } catch (err) {
@@ -47,6 +46,8 @@ export default function Login() {
       if (err.response) {
         errorMessage =
           err.response.data.detail || err.response.data.message || errorMessage;
+      } else if (err.request) {
+        errorMessage = 'No response from server. Please check your connection.';
       }
       setError(errorMessage);
       toast.error(errorMessage);

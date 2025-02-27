@@ -4,46 +4,50 @@ import { useMemo, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import ProductsContext from './ProductsContext';
 
-export const ProductsProvider = ({ children }) => {
+const ProductsProvider = ({ children }) => {
   const [products, setProducts] = useState({ results: [], count: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { auth } = useAuth();
 
-  // Memoized axios instances
   const api = useMemo(
     () =>
       axios.create({
         baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
       }),
     [auth.accessToken],
   );
 
   const publicApi = useMemo(
     () =>
-      axios.create({
-        baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
-      }),
+      axios.create({ baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/' }),
     [],
   );
 
-  const handleError = (err, defaultMessage) => {
-    setError(err.response?.data?.message || err.message || defaultMessage);
+  const handleError = (err) => {
+    const errorMessage = err.response?.data?.message || 'An error occurred';
+    const errorCode = err.response?.data?.error
+      ? ` (${err.response.data.error})`
+      : '';
+    setError(`${errorMessage}${errorCode}`);
   };
 
   const fetchProducts = async (params = {}) => {
     setLoading(true);
     try {
       const response = await publicApi.get('products/', { params });
-      setProducts({
-        results: response.data.results.products || [],
-        count: response.data.count || 0,
-      });
+
+      // Correct response structure access
+      const productData = response.data.results.products;
+      const count = response.data.results.count;
+
+      console.log('API Response Products:', productData);
+      console.log('API Response Count:', count);
+
+      setProducts({ results: productData, count });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch products');
+      handleError(err);
     } finally {
       setLoading(false);
     }
@@ -59,17 +63,16 @@ export const ProductsProvider = ({ children }) => {
 
   const createProduct = async (productData) => {
     if (!verifyAdmin()) return;
-
     setError(null);
     setLoading(true);
     try {
       const response = await api.post('products/', productData);
       setProducts((prev) => ({
         ...prev,
-        results: [...prev.results, response.data],
+        results: [...prev.results, response.data.data],
       }));
     } catch (err) {
-      handleError(err, 'Failed to create product');
+      handleError(err);
     } finally {
       setLoading(false);
     }
@@ -77,7 +80,6 @@ export const ProductsProvider = ({ children }) => {
 
   const updateProduct = async (id, productData) => {
     if (!verifyAdmin()) return;
-
     setError(null);
     setLoading(true);
     try {
@@ -85,11 +87,11 @@ export const ProductsProvider = ({ children }) => {
       setProducts((prev) => ({
         ...prev,
         results: prev.results.map((product) =>
-          product.id === id ? response.data : product,
+          product.id === id ? response.data.data : product,
         ),
       }));
     } catch (err) {
-      handleError(err, 'Failed to update product');
+      handleError(err);
     } finally {
       setLoading(false);
     }
@@ -97,7 +99,6 @@ export const ProductsProvider = ({ children }) => {
 
   const deleteProduct = async (id) => {
     if (!verifyAdmin()) return;
-
     setError(null);
     setLoading(true);
     try {
@@ -107,7 +108,7 @@ export const ProductsProvider = ({ children }) => {
         results: prev.results.filter((product) => product.id !== id),
       }));
     } catch (err) {
-      handleError(err, 'Failed to delete product');
+      handleError(err);
     } finally {
       setLoading(false);
     }
@@ -119,9 +120,7 @@ export const ProductsProvider = ({ children }) => {
         `/products/${productId}/images/`,
         formData,
         {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+          headers: { 'Content-Type': 'multipart/form-data' },
         },
       );
       return response.data;
@@ -152,3 +151,5 @@ export const ProductsProvider = ({ children }) => {
 ProductsProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export default ProductsProvider;

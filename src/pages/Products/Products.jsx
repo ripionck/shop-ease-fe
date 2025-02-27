@@ -1,3 +1,4 @@
+// src/components/Products.js
 import axios from 'axios';
 import { Grid, List } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -8,66 +9,36 @@ import ProductFilters from '../../components/ProductFilters';
 import Spinner from '../../components/Spinner';
 import useAuth from '../../hooks/useAuth';
 import useCategories from '../../hooks/useCategories';
+import useProducts from '../../hooks/useProducts';
 
 const Products = () => {
   const { categories } = useCategories();
+  const { auth } = useAuth();
+  const { products, loading, error, fetchProducts } = useProducts();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('featured');
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const productsPerPage = 9;
-  const { auth } = useAuth();
+
+  const totalPages = Math.ceil(products.count / productsPerPage);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const params = new URLSearchParams();
-        if (searchTerm) params.append('search', searchTerm);
-
-        // Append categories
-        if (selectedCategories.length > 0) {
-          selectedCategories.forEach((category) =>
-            params.append('category[]', category),
-          );
-        }
-
-        // Append price range
-        params.append('min_price', priceRange[0]);
-        params.append('max_price', priceRange[1]);
-
-        // Append ratings as a comma-separated string
-        if (selectedRatings.length > 0) {
-          params.append('rating', selectedRatings.join(','));
-        }
-
-        // Append sort and page
-        params.append('sort', sortBy);
-        params.append('page', currentPage);
-
-        // console.log('Sending Params:', params.toString());
-        const response = await axios.get(
-          'https://shop-ease-3oxf.onrender.com/api/v1/products/',
-          { params: params },
-        );
-        setProducts(response.data.products);
-
-        setTotalPages(Math.ceil(response.data.count / productsPerPage));
-      } catch (error) {
-        setError(error.message);
-        console.error('Error fetching data:', error);
-        toast.error('Failed to fetch products. Please try again.');
-      } finally {
-        setLoading(false);
-      }
+    const params = {
+      search: searchTerm,
+      category: selectedCategories,
+      min_price: priceRange[0],
+      max_price: priceRange[1],
+      rating: selectedRatings.join(','),
+      sort: sortBy,
+      page: currentPage,
     };
-    fetchData();
+
+    fetchProducts(params);
   }, [
     currentPage,
     searchTerm,
@@ -77,19 +48,13 @@ const Products = () => {
     sortBy,
   ]);
 
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-    }
-  };
-
   const handleCategoryChange = (category) => {
     setSelectedCategories((prev) =>
       prev.includes(category)
         ? prev.filter((c) => c !== category)
         : [...prev, category],
     );
-    setCurrentPage(1); // Reset pagination when filters change
+    setCurrentPage(1);
   };
 
   const handleRatingChange = (rating) => {
@@ -98,7 +63,7 @@ const Products = () => {
         ? prev.filter((r) => r !== rating)
         : [...prev, rating],
     );
-    setCurrentPage(1); // Reset pagination when filters change
+    setCurrentPage(1);
   };
 
   const handleClearFilters = () => {
@@ -204,12 +169,12 @@ const Products = () => {
                 : 'space-y-6'
             }
           >
-            {products?.length === 0 ? (
+            {products.results?.length === 0 ? (
               <div className="text-center py-8 text-gray-600">
                 No products found
               </div>
             ) : (
-              products.map((product) => (
+              products.results.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
@@ -222,7 +187,7 @@ const Products = () => {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={handlePageChange}
+            onPageChange={setCurrentPage}
           />
         </div>
       </div>

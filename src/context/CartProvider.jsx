@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import CartContext from './CartContext';
 
-export const CartProvider = ({ children }) => {
+const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -169,3 +169,5 @@ export const CartProvider = ({ children }) => {
 CartProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export default CartProvider;
