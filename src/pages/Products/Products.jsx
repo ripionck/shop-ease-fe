@@ -56,7 +56,7 @@ const Products = () => {
           'https://shop-ease-3oxf.onrender.com/api/v1/products/',
           { params: params },
         );
-        setProducts(response.data.products);
+        setProducts(response.data.results.products);
 
         setTotalPages(Math.ceil(response.data.count / productsPerPage));
       } catch (error) {
@@ -204,7 +204,7 @@ const Products = () => {
                 : 'space-y-6'
             }
           >
-            {products.length === 0 ? (
+            {products?.length === 0 ? (
               <div className="text-center py-8 text-gray-600">
                 No products found
               </div>
