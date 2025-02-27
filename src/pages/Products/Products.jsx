@@ -51,13 +51,13 @@ const Products = () => {
         params.append('sort', sortBy);
         params.append('page', currentPage);
 
-        console.log('Sending Params:', params.toString());
+        // console.log('Sending Params:', params.toString());
         const response = await axios.get(
           'https://shop-ease-3oxf.onrender.com/api/v1/products/',
           { params: params },
         );
+        setProducts(response.data.products);
 
-        setProducts(response.data.results.products);
         setTotalPages(Math.ceil(response.data.count / productsPerPage));
       } catch (error) {
         setError(error.message);
