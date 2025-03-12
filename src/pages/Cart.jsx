@@ -1,11 +1,14 @@
 import { Lock, Minus, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Spinner from '../components/Spinner';
+import useAuth from '../hooks/useAuth';
 import useCart from '../hooks/useCart';
 
 export default function Cart() {
+  const navigate = useNavigate();
+  const { auth } = useAuth();
   const {
     cartItems,
     loading: cartLoading,
@@ -22,7 +25,7 @@ export default function Cart() {
   // Handle unauthorized errors
   const handleUnauthorized = () => {
     localStorage.removeItem('access_token');
-    window.location.href = '/login';
+    navigate('/login');
   };
 
   // Update item quantity
@@ -75,8 +78,19 @@ export default function Cart() {
 
   // Fetch cart data on mount
   useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    if (!auth.isLoggedIn) {
+      console.log('Token exists but auth context not updated');
+      return;
+    }
+
     fetchCart();
-  }, [fetchCart]);
+  }, [auth, fetchCart, navigate]);
 
   if (cartLoading)
     return (

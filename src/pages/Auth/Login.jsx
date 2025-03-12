@@ -37,8 +37,10 @@ export default function Login() {
           password: formData.password,
         },
       );
+
       const { access, refresh } = response.data;
       await login({ access, refresh }, formData.rememberMe);
+
       toast.success('Login successful!');
       navigate('/');
     } catch (err) {

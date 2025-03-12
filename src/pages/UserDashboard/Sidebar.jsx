@@ -1,10 +1,10 @@
 import { Heart, SettingsIcon, ShoppingBag, User } from 'lucide-react';
-import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
 export default function Sidebar() {
   const { user } = useAuth();
+  console.log(user);
   return (
     <div className="w-64 bg-white shadow-lg p-4">
       {/* User Profile Section */}
@@ -84,11 +84,3 @@ export default function Sidebar() {
     </div>
   );
 }
-
-Sidebar.propTypes = {
-  user: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
-    avatar: PropTypes.string.isRequired,
-  }).isRequired,
-};

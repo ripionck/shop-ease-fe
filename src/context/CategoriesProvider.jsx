@@ -1,8 +1,18 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { useEffect, useMemo, useState } from 'react';
+import { createContext, useEffect, useMemo, useState } from 'react';
 import useAuth from '../hooks/useAuth';
-import CategoriesContext from './CategoriesContext';
+
+// Create CategoriesContext
+const CategoriesContext = createContext({
+  categories: [],
+  loading: false,
+  error: null,
+  fetchCategories: () => {},
+  createCategory: () => {},
+  updateCategory: () => {},
+  deleteCategory: () => {},
+});
 
 const CategoriesProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
@@ -10,6 +20,7 @@ const CategoriesProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { auth } = useAuth();
 
+  // Authorized API instance
   const api = useMemo(
     () =>
       axios.create({
@@ -19,16 +30,14 @@ const CategoriesProvider = ({ children }) => {
     [auth.accessToken],
   );
 
+  // Public API instance
   const publicApi = useMemo(
     () =>
       axios.create({ baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/' }),
     [],
   );
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
+  // Error handler
   const handleError = (err) => {
     const errorMessage = err.response?.data?.message || 'An error occurred';
     const errorCode = err.response?.data?.error
@@ -37,6 +46,7 @@ const CategoriesProvider = ({ children }) => {
     setError(`${errorMessage}${errorCode}`);
   };
 
+  // Fetch categories
   const fetchCategories = async () => {
     setLoading(true);
     try {
@@ -49,6 +59,7 @@ const CategoriesProvider = ({ children }) => {
     }
   };
 
+  // Admin verification
   const verifyAdmin = () => {
     if (auth.user?.role !== 'admin') {
       setError('Only admin users can perform this action');
@@ -57,6 +68,7 @@ const CategoriesProvider = ({ children }) => {
     return true;
   };
 
+  // Create category
   const createCategory = async (categoryData) => {
     if (!verifyAdmin()) return;
     setError(null);
@@ -71,6 +83,7 @@ const CategoriesProvider = ({ children }) => {
     }
   };
 
+  // Update category
   const updateCategory = async (id, categoryData) => {
     if (!verifyAdmin()) return;
     setError(null);
@@ -87,6 +100,7 @@ const CategoriesProvider = ({ children }) => {
     }
   };
 
+  // Delete category
   const deleteCategory = async (id) => {
     if (!verifyAdmin()) return;
     setError(null);
@@ -100,6 +114,10 @@ const CategoriesProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   return (
     <CategoriesContext.Provider
@@ -122,4 +140,4 @@ CategoriesProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default CategoriesProvider;
+export { CategoriesContext, CategoriesProvider };

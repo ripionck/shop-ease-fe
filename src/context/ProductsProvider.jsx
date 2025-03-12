@@ -1,8 +1,19 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { useMemo, useState } from 'react';
+import { createContext, useMemo, useState } from 'react';
 import useAuth from '../hooks/useAuth';
-import ProductsContext from './ProductsContext';
+
+// Create ProductsContext
+const ProductsContext = createContext({
+  products: [],
+  loading: false,
+  error: null,
+  fetchProducts: () => {},
+  createProduct: () => {},
+  updateProduct: () => {},
+  deleteProduct: () => {},
+  uploadProductImage: () => {},
+});
 
 const ProductsProvider = ({ children }) => {
   const [products, setProducts] = useState({ results: [], count: 0 });
@@ -10,6 +21,7 @@ const ProductsProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { auth } = useAuth();
 
+  // API instances
   const api = useMemo(
     () =>
       axios.create({
@@ -25,6 +37,7 @@ const ProductsProvider = ({ children }) => {
     [],
   );
 
+  // Handle API errors
   const handleError = (err) => {
     const errorMessage = err.response?.data?.message || 'An error occurred';
     const errorCode = err.response?.data?.error
@@ -33,17 +46,13 @@ const ProductsProvider = ({ children }) => {
     setError(`${errorMessage}${errorCode}`);
   };
 
+  // Fetch products
   const fetchProducts = async (params = {}) => {
     setLoading(true);
     try {
       const response = await publicApi.get('products/', { params });
-
-      // Correct response structure access
       const productData = response.data.results.products;
       const count = response.data.results.count;
-
-      console.log('API Response Products:', productData);
-      console.log('API Response Count:', count);
 
       setProducts({ results: productData, count });
     } catch (err) {
@@ -53,6 +62,7 @@ const ProductsProvider = ({ children }) => {
     }
   };
 
+  // Verify admin privileges
   const verifyAdmin = () => {
     if (auth.user?.role !== 'admin') {
       setError('Only admin users can perform this action');
@@ -61,6 +71,7 @@ const ProductsProvider = ({ children }) => {
     return true;
   };
 
+  // Create a new product
   const createProduct = async (productData) => {
     if (!verifyAdmin()) return;
     setError(null);
@@ -78,6 +89,7 @@ const ProductsProvider = ({ children }) => {
     }
   };
 
+  // Update an existing product
   const updateProduct = async (id, productData) => {
     if (!verifyAdmin()) return;
     setError(null);
@@ -97,6 +109,7 @@ const ProductsProvider = ({ children }) => {
     }
   };
 
+  // Delete a product
   const deleteProduct = async (id) => {
     if (!verifyAdmin()) return;
     setError(null);
@@ -114,6 +127,7 @@ const ProductsProvider = ({ children }) => {
     }
   };
 
+  // Upload a product image
   const uploadProductImage = async (productId, formData) => {
     try {
       const response = await api.post(
@@ -152,4 +166,4 @@ ProductsProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default ProductsProvider;
+export { ProductsContext, ProductsProvider };

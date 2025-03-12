@@ -1,8 +1,18 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import Spinner from '../components/Spinner';
-import AuthContext from './AuthContext';
+
+const AuthContext = createContext({
+  loading: true,
+  auth: {
+    user: null,
+    accessToken: null,
+    isLoggedIn: false,
+  },
+  login: () => {},
+  logout: () => {},
+});
 
 const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
@@ -26,12 +36,18 @@ const AuthProvider = ({ children }) => {
         setLoading(false);
         return;
       }
+
       const response = await axios.get(
         'https://shop-ease-3oxf.onrender.com/api/v1/profile/',
-        { headers: { Authorization: `Bearer ${accessToken}` } },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
       );
+
       setAuth({
-        user: response.data,
+        user: response.data.user,
         accessToken: accessToken,
         isLoggedIn: true,
       });
@@ -45,24 +61,45 @@ const AuthProvider = ({ children }) => {
   };
 
   const login = async (tokens, rememberMe) => {
-    const storage = rememberMe ? localStorage : sessionStorage;
-    storage.setItem('access_token', tokens.access);
-    storage.setItem('refresh_token', tokens.refresh);
+    try {
+      // Clear tokens from both storages to avoid conflicts
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      sessionStorage.removeItem('access_token');
+      sessionStorage.removeItem('refresh_token');
 
-    setAuth((prev) => ({
-      ...prev,
-      accessToken: tokens.access,
-      isLoggedIn: true,
-    }));
+      // Store tokens in the appropriate storage based on rememberMe
+      if (rememberMe) {
+        localStorage.setItem('access_token', tokens.access);
+        localStorage.setItem('refresh_token', tokens.refresh);
+      } else {
+        sessionStorage.setItem('access_token', tokens.access);
+        sessionStorage.setItem('refresh_token', tokens.refresh);
+      }
 
-    await fetchUserProfile();
+      // Update auth state
+      setAuth({
+        user: null, // Temporarily set to null until profile is fetched
+        accessToken: tokens.access,
+        isLoggedIn: true,
+      });
+
+      // Fetch user profile
+      await fetchUserProfile();
+    } catch (error) {
+      console.error('Error during login:', error);
+      throw error;
+    }
   };
 
   const logout = () => {
-    ['access_token', 'refresh_token'].forEach((token) => {
-      localStorage.removeItem(token);
-      sessionStorage.removeItem(token);
-    });
+    // Clear tokens from both storages
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refresh_token');
+
+    // Reset auth state
     setAuth({
       user: null,
       accessToken: null,
@@ -105,4 +142,4 @@ AuthProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default AuthProvider;
+export { AuthContext, AuthProvider };

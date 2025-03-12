@@ -45,7 +45,7 @@ export default function Profile() {
           zip_code,
           image,
           created_at,
-        } = response.data;
+        } = response.data.user;
         setProfile({
           username,
           email,
@@ -109,6 +109,7 @@ export default function Profile() {
       setShowEditAddressModal(false);
       // Refresh profile data
       const response = await api.get('/profile/');
+      console.log(response);
       setProfile({
         ...profile,
         street: response.data.street,

@@ -1,8 +1,19 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { useCallback, useEffect, useState } from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
-import CartContext from './CartContext';
+
+// Create the CartContext
+const CartContext = createContext({
+  cartItems: [],
+  loading: false,
+  error: null,
+  fetchCart: () => {},
+  addToCart: () => {},
+  updateCartItem: () => {},
+  removeFromCart: () => {},
+  clearCart: () => {},
+});
 
 const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -10,17 +21,19 @@ const CartProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { auth } = useAuth();
 
-  // Create API instance with the latest access token
+  // Create a reusable API instance with the latest access token
   const getApi = useCallback(() => {
     return axios.create({
       baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
       headers: {
-        Authorization: `Bearer ${auth?.accessToken}`,
+        Authorization: auth?.accessToken
+          ? `Bearer ${auth.accessToken}`
+          : undefined,
       },
     });
   }, [auth?.accessToken]);
 
-  // Fetch cart items
+  // Fetch cart items from the server
   const fetchCart = useCallback(async () => {
     if (!auth?.accessToken) {
       setCartItems([]);
@@ -28,34 +41,37 @@ const CartProvider = ({ children }) => {
     }
 
     setLoading(true);
+    setError(null); // Reset the error state before fetching
     try {
       const api = getApi();
       const response = await api.get('cart/');
 
-      // Merge local changes with server state
-      setCartItems((prev) => {
-        const serverItems = response.data?.cart?.products || [];
-        if (!Array.isArray(serverItems)) return prev;
+      const serverItems = response.data?.cart?.products || [];
 
-        // Preserve local modifications that haven't been synced
-        return serverItems.map((serverItem) => {
+      if (!Array.isArray(serverItems)) {
+        throw new Error('Invalid server response format');
+      }
+
+      setCartItems((prev) =>
+        serverItems.map((serverItem) => {
           const localItem = prev.find((item) => item.id === serverItem.id);
-          return localItem || serverItem;
-        });
-      });
+          return localItem || serverItem; // Use the server item or keep local one
+        }),
+      );
     } catch (err) {
-      console.error('Error fetching cart:', err);
+      console.error('Cart fetch error:', err);
+      setError(err.response?.data?.message || 'Failed to fetch cart');
     } finally {
       setLoading(false);
     }
   }, [getApi, auth?.accessToken]);
 
-  // Fetch cart only on mount/auth change
+  // Automatically fetch cart items on component mount/auth change
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
 
-  // Add item to cart
+  // Add a product to the cart
   const addToCart = async (productId, quantity = 1) => {
     if (!auth?.user) {
       setError('You must be logged in to add items to cart');
@@ -63,51 +79,34 @@ const CartProvider = ({ children }) => {
     }
 
     setLoading(true);
+    setError(null);
     try {
       const api = getApi();
-      const response = await api.post('cart/add/', {
-        product_id: productId,
-        quantity,
-      });
-
-      // If the backend returns the updated cart, use it
-      if (response.data && Array.isArray(response.data.cart.products)) {
-        setCartItems(response.data.cart.products);
-      } else {
-        // Fallback to optimistic update
-        setCartItems((prev) => {
-          if (!Array.isArray(prev)) {
-            console.error('prev is not an array:', prev);
-            return [response.data]; // Fallback to a new array
-          }
-          return [...prev, response.data]; // Add the new item to the cart
-        });
-      }
-
+      await api.post('cart/add/', { product_id: productId, quantity });
+      await fetchCart(); // Refresh cart after adding an item
       return true;
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || 'Failed to add item to cart';
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      console.error('Error adding to cart:', err);
+      setError(err.response?.data?.message || 'Failed to add item to cart');
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  // Update cart item quantity
+  // Update the quantity of an item in the cart
   const updateCartItem = async (itemId, quantity) => {
     if (!auth?.user) {
-      setError('You must be logged in to update cart');
+      setError('You must be logged in to update the cart');
       return;
     }
 
     setLoading(true);
+    setError(null);
     try {
       const api = getApi();
       await api.patch(`cart/update/${itemId}/`, { quantity });
 
-      // Optimistic update: Update the specific item in the cart
       setCartItems((prev) =>
         prev.map((item) => (item.id === itemId ? { ...item, quantity } : item)),
       );
@@ -119,31 +118,29 @@ const CartProvider = ({ children }) => {
     }
   };
 
-  // Remove item from cart
+  // Remove an item from the cart
   const removeFromCart = async (itemId) => {
     if (!auth?.user) {
-      setError('You must be logged in to modify cart');
+      setError('You must be logged in to modify the cart');
       return;
     }
 
     setLoading(true);
+    setError(null);
     try {
       const api = getApi();
       await api.delete(`cart/remove/${itemId}/`);
 
-      // Optimistic update: Remove the item from the cart
       setCartItems((prev) => prev.filter((item) => item.id !== itemId));
     } catch (err) {
-      console.error('Error removing item from cart:', err);
-      setError(
-        err.response?.data?.message || 'Failed to remove item from cart',
-      );
+      console.error('Error removing cart item:', err);
+      setError(err.response?.data?.message || 'Failed to remove cart item');
     } finally {
       setLoading(false);
     }
   };
 
-  // Clear the entire cart (frontend-only, no API call)
+  // Clear the cart (frontend-only, no API call)
   const clearCart = () => {
     setCartItems([]);
   };
@@ -170,4 +167,4 @@ CartProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default CartProvider;
+export { CartContext, CartProvider };

@@ -27,8 +27,8 @@ export default function Orders() {
         const response = await api.get('/orders/', {
           params: { page: currentPage, page_size: ordersPerPage },
         });
-        setOrders(response.data.orders);
-        setTotalPages(Math.ceil(response.data.orders.length / ordersPerPage));
+        setOrders(response.data.data); // Ensure this matches the backend response structure
+        setTotalPages(response.data.total_pages); // Ensure backend returns total_pages
       } catch (err) {
         handleError(err);
       } finally {

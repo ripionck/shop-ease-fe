@@ -3,22 +3,17 @@ import { Pencil, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Spinner from '../../components/Spinner';
 import useAuth from '../../hooks/useAuth';
+import useCategories from '../../hooks/useCategories';
 import AddCategoryModal from './AddCategoryModal';
 
 export default function Categories() {
   const { auth } = useAuth();
-  const [categories, setCategories] = useState([]);
+  const { categories, loading, error, deleteCategory, fetchCategories } =
+    useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Public API instance for GET requests
-  const publicApi = axios.create({
-    baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
-  });
-
-  // Authenticated API instance for write operations
   const authApi = axios.create({
     baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
     headers: {
@@ -26,62 +21,38 @@ export default function Categories() {
     },
   });
 
-  const fetchCategories = async () => {
-    try {
-      const response = await publicApi.get('categories/');
-      setCategories(response.data.categories);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load categories', err);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchCategories();
   }, []);
 
   const handleDelete = async (id) => {
     if (auth.user?.role !== 'admin') {
-      setError('Only admin users can delete categories');
       return;
     }
-
-    try {
-      await authApi.delete(`categories/${id}/`);
-      setCategories(categories.filter((cat) => cat.id !== id));
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete category');
-    }
+    await deleteCategory(id);
   };
 
   const handleSubmit = async (formData) => {
     if (auth.user?.role !== 'admin') {
-      setError('Only admin users can modify categories');
       return;
     }
 
+    setIsSubmitting(true);
     try {
       if (selectedCategory) {
-        // Update
-        const response = await authApi.patch(
-          `categories/${selectedCategory.id}/`,
-          formData,
-        );
-        setCategories(
-          categories.map((cat) =>
-            cat.id === selectedCategory.id ? response.data.category : cat,
-          ),
-        );
+        // Update category
+        await authApi.patch(`categories/${selectedCategory.id}/`, formData);
       } else {
-        // Create
-        const response = await authApi.post('categories/', formData);
-        setCategories([...categories, response.data.category]);
+        // Create category
+        await authApi.post('categories/', formData);
       }
       setIsModalOpen(false);
       setSelectedCategory(null);
+      await fetchCategories();
     } catch (err) {
-      setError(err.response?.data?.message || 'Operation failed');
+      console.error('Error:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -91,6 +62,7 @@ export default function Categories() {
         <Spinner />
       </div>
     );
+
   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
 
   return (
@@ -166,6 +138,7 @@ export default function Categories() {
         }}
         onSubmit={handleSubmit}
         category={selectedCategory}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

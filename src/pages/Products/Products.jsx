@@ -79,18 +79,28 @@ const Products = () => {
       toast.error('Please log in to use wishlist.');
       return;
     }
+
     try {
-      await axios.post(
+      console.log('Adding to wishlist:', {
+        productId,
+        accessToken: auth.accessToken,
+      });
+
+      const response = await axios.post(
         'https://shop-ease-3oxf.onrender.com/v1/wishlist/add/',
         { product_id: productId },
         { headers: { Authorization: `Bearer ${auth.accessToken}` } },
       );
+
+      console.log('Wishlist response:', response.data);
       toast.success('Added to wishlist!');
     } catch (error) {
       console.error('Error adding to wishlist:', error);
-      toast.error(
-        error.response?.data?.message || 'Failed to add to wishlist.',
-      );
+
+      // Extract and display detailed error message
+      const errorMessage =
+        error.response?.data?.message || 'Failed to add to wishlist.';
+      toast.error(errorMessage);
     }
   };
 

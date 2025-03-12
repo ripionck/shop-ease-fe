@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ConfirmationModal } from '../components/ConfirmationModal';
 import Spinner from '../components/Spinner';
+import useCart from '../hooks/useCart';
 
 const getAccessToken = () => localStorage.getItem('access_token');
 
@@ -14,8 +16,8 @@ const api = axios.create({
 });
 
 export default function Checkout() {
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { cartItems, loading, error } = useCart();
   const [formLoading, setFormLoading] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -28,29 +30,26 @@ export default function Checkout() {
     state: '',
     country: '',
     zipCode: '',
+    cardNumber: '',
+    cardName: '',
+    cardExpiry: '',
+    cardCVC: '',
+    saveCard: false,
   });
-
-  // Fetch cart items
-  const fetchCart = async () => {
-    try {
-      const { data } = await api.get('/cart/');
-      setCartItems(data.cart.products || []);
-    } catch (err) {
-      handleError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Handle form input
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value,
+    });
   };
 
   // Handle errors
   const handleError = (err) => {
     if (err.response?.status === 401) {
-      window.location.href = '/login';
+      navigate('/login');
     } else {
       toast.error(err.response?.data?.message || 'An error occurred');
     }
@@ -74,6 +73,12 @@ export default function Checkout() {
           country: formData.country,
           zip_code: formData.zipCode,
         },
+        payment_details: {
+          card_number: formData.cardNumber,
+          card_name: formData.cardName,
+          card_expiry: formData.cardExpiry,
+          card_cvc: formData.cardCVC,
+        },
       });
 
       // 2. Show Confirmation (Skip clearing cart if API is not available)
@@ -89,7 +94,7 @@ export default function Checkout() {
 
   // Calculate totals
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + parseFloat(item.price) * item.quantity,
     0,
   );
   const shipping = 9.99;
@@ -97,9 +102,11 @@ export default function Checkout() {
   const total = subtotal + shipping + tax;
 
   useEffect(() => {
-    if (!getAccessToken()) window.location.href = '/login';
-    else fetchCart();
-  }, []);
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      navigate('/login');
+    }
+  }, [navigate]);
 
   if (loading)
     return (
@@ -107,6 +114,14 @@ export default function Checkout() {
         <Spinner />
       </div>
     );
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -225,6 +240,82 @@ export default function Checkout() {
                     />
                   </div>
                 </div>
+
+                {/* Credit Card Form */}
+                <div className="mt-8">
+                  <h2 className="text-xl font-medium">Payment Details</h2>
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Card Number *
+                      </label>
+                      <input
+                        name="cardNumber"
+                        value={formData.cardNumber}
+                        onChange={handleInputChange}
+                        className="w-full border rounded-md px-3 py-2"
+                        placeholder="1234 5678 9012 3456"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Name on Card *
+                      </label>
+                      <input
+                        name="cardName"
+                        value={formData.cardName}
+                        onChange={handleInputChange}
+                        className="w-full border rounded-md px-3 py-2"
+                        placeholder="John Doe"
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">
+                          Expiry Date *
+                        </label>
+                        <input
+                          name="cardExpiry"
+                          value={formData.cardExpiry}
+                          onChange={handleInputChange}
+                          className="w-full border rounded-md px-3 py-2"
+                          placeholder="MM / YY"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">
+                          CVC Code *
+                        </label>
+                        <input
+                          name="cardCVC"
+                          value={formData.cardCVC}
+                          onChange={handleInputChange}
+                          className="w-full border rounded-md px-3 py-2"
+                          placeholder="123"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="saveCard"
+                        checked={formData.saveCard}
+                        onChange={handleInputChange}
+                        className="mr-2"
+                      />
+                      <label className="text-sm text-gray-600">
+                        Save Credit Card details for future use
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -250,7 +341,7 @@ export default function Checkout() {
                         </p>
                       </div>
                       <div className="font-medium">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        ${(parseFloat(item.price) * item.quantity).toFixed(2)}
                       </div>
                     </div>
                   ))}
