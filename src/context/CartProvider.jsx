@@ -24,7 +24,7 @@ const CartProvider = ({ children }) => {
   // Create a reusable API instance with the latest access token
   const getApi = useCallback(() => {
     return axios.create({
-      baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
+      baseURL: 'http://127.0.0.1:8000/api/v1/',
       headers: {
         Authorization: auth?.accessToken
           ? `Bearer ${auth.accessToken}`

@@ -30,13 +30,10 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        'https://shop-ease-3oxf.onrender.com/api/v1/login/',
-        {
-          email: formData.email,
-          password: formData.password,
-        },
-      );
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/login/', {
+        email: formData.email,
+        password: formData.password,
+      });
 
       const { access, refresh } = response.data;
       await login({ access, refresh }, formData.rememberMe);

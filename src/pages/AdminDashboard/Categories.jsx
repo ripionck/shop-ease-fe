@@ -13,9 +13,8 @@ export default function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const authApi = axios.create({
-    baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
+    baseURL: 'http://127.0.0.1:8000/api/v1/',
     headers: {
       Authorization: `Bearer ${auth?.accessToken}`,
     },

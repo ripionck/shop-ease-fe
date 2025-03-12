@@ -87,7 +87,7 @@ const Products = () => {
       });
 
       const response = await axios.post(
-        'https://shop-ease-3oxf.onrender.com/v1/wishlist/add/',
+        'http://127.0.0.1:8000/v1/wishlist/add/',
         { product_id: productId },
         { headers: { Authorization: `Bearer ${auth.accessToken}` } },
       );

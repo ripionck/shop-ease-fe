@@ -30,20 +30,17 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch(
-        'https://shop-ease-3oxf.onrender.com/api/v1/register',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: formData.username,
-            email: formData.email,
-            password: formData.password,
-          }),
+      const response = await fetch('http://127.0.0.1:8000/api/v1/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
       const data = await response.json();
 

@@ -9,7 +9,7 @@ import useCart from '../hooks/useCart';
 const getAccessToken = () => localStorage.getItem('access_token');
 
 const api = axios.create({
-  baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
+  baseURL: 'http://127.0.0.1:8000/api/v1/',
   headers: {
     Authorization: `Bearer ${getAccessToken()}`,
   },

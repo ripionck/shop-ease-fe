@@ -38,14 +38,14 @@ const AuthProvider = ({ children }) => {
       }
 
       const response = await axios.get(
-        'https://shop-ease-3oxf.onrender.com/api/v1/profile/',
+        'http://127.0.0.1:8000/api/v1/profile/',
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         },
       );
-
+      console.log(response);
       setAuth({
         user: response.data.user,
         accessToken: accessToken,
@@ -62,13 +62,11 @@ const AuthProvider = ({ children }) => {
 
   const login = async (tokens, rememberMe) => {
     try {
-      // Clear tokens from both storages to avoid conflicts
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       sessionStorage.removeItem('access_token');
       sessionStorage.removeItem('refresh_token');
 
-      // Store tokens in the appropriate storage based on rememberMe
       if (rememberMe) {
         localStorage.setItem('access_token', tokens.access);
         localStorage.setItem('refresh_token', tokens.refresh);
@@ -77,14 +75,12 @@ const AuthProvider = ({ children }) => {
         sessionStorage.setItem('refresh_token', tokens.refresh);
       }
 
-      // Update auth state
       setAuth({
-        user: null, // Temporarily set to null until profile is fetched
+        user: null,
         accessToken: tokens.access,
         isLoggedIn: true,
       });
 
-      // Fetch user profile
       await fetchUserProfile();
     } catch (error) {
       console.error('Error during login:', error);
@@ -93,13 +89,11 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Clear tokens from both storages
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('refresh_token');
 
-    // Reset auth state
     setAuth({
       user: null,
       accessToken: null,

@@ -13,15 +13,14 @@ export default function Wishlist() {
     const fetchWishlist = async () => {
       try {
         const response = await axios.get(
-          'https://shop-ease-3oxf.onrender.com/api/v1/wishlist/',
+          'http://127.0.0.1:8000/api/v1/wishlist/',
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           },
         );
-        console.log(response);
-        setWishlistItems(response.data.data.products || []);
+        setWishlistItems(response.data.products || []);
       } catch (error) {
         console.error('Error fetching wishlist:', error);
         toast.error('Failed to fetch wishlist');

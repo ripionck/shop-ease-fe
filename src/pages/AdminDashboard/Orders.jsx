@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 const accessToken = localStorage.getItem('access_token');
 
 const api = axios.create({
-  baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
+  baseURL: 'http://127.0.0.1:8000/api/v1/',
   headers: {
     Authorization: `Bearer ${accessToken}`,
   },
@@ -29,13 +29,12 @@ export default function Orders({ onOpenModal }) {
   const [selectedStatus, setSelectedStatus] = useState('All Status');
   const [selectedDate, setSelectedDate] = useState('');
 
-  // Fetch orders and calculate stats
   const fetchOrders = async () => {
     try {
       const response = await api.get('/orders/');
-      setOrders(response.data.orders);
-      setFilteredOrders(response.data.orders);
-      calculateStats(response.data.orders);
+      setOrders(response.data.results);
+      setFilteredOrders(response.data.results);
+      calculateStats(response.data.results);
     } catch (err) {
       handleFetchError(err);
     } finally {
@@ -43,7 +42,6 @@ export default function Orders({ onOpenModal }) {
     }
   };
 
-  // Calculate stats based on orders
   const calculateStats = (orders) => {
     const newOrders = orders.filter(
       (order) => order.status === 'pending',
@@ -68,7 +66,6 @@ export default function Orders({ onOpenModal }) {
     fetchOrders();
   }, []);
 
-  // Update filters whenever status or date changes
   useEffect(() => {
     let filtered = orders;
 
@@ -87,15 +84,14 @@ export default function Orders({ onOpenModal }) {
     }
 
     setFilteredOrders(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   }, [selectedStatus, selectedDate, orders]);
 
-  // Update order status
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       await api.patch(`/orders/${orderId}/status/`, { status: newStatus });
       toast.success('Order status updated successfully');
-      fetchOrders(); // Refresh orders after update
+      fetchOrders();
     } catch (err) {
       toast.error(
         err.response?.data?.message || 'Failed to update order status',
@@ -103,7 +99,6 @@ export default function Orders({ onOpenModal }) {
     }
   };
 
-  // Pagination logic
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = filteredOrders.slice(
@@ -113,7 +108,6 @@ export default function Orders({ onOpenModal }) {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Export all filtered orders
   const handleExport = async () => {
     try {
       const response = await api.get('/orders/', {
@@ -123,7 +117,6 @@ export default function Orders({ onOpenModal }) {
         },
       });
 
-      // Here you would typically handle the export logic
       console.log('Exporting orders:', response.data.orders);
       toast.success('Export initiated successfully');
     } catch (err) {
@@ -131,7 +124,6 @@ export default function Orders({ onOpenModal }) {
     }
   };
 
-  // Loading and error states
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center">

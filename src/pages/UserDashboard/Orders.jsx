@@ -7,7 +7,7 @@ import Spinner from '../../components/Spinner';
 const getAccessToken = () => localStorage.getItem('access_token');
 
 const api = axios.create({
-  baseURL: 'https://shop-ease-3oxf.onrender.com/api/v1/',
+  baseURL: 'http://127.0.0.1:8000/api/v1/',
   headers: {
     Authorization: `Bearer ${getAccessToken()}`,
   },
@@ -17,18 +17,25 @@ export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [pagination, setPagination] = useState({
+    next: null,
+    previous: null,
+    count: 0,
+  });
   const ordersPerPage = 5;
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await api.get('/orders/', {
-          params: { page: currentPage, page_size: ordersPerPage },
+          params: { page_size: ordersPerPage },
         });
-        setOrders(response.data.data); // Ensure this matches the backend response structure
-        setTotalPages(response.data.total_pages); // Ensure backend returns total_pages
+        setOrders(response.data.results);
+        setPagination({
+          next: response.data.next,
+          previous: response.data.previous,
+          count: response.data.count,
+        });
       } catch (err) {
         handleError(err);
       } finally {
@@ -37,7 +44,7 @@ export default function Orders() {
     };
 
     fetchOrders();
-  }, [currentPage]);
+  }, []);
 
   const handleError = (err) => {
     if (err.response?.status === 401) {
@@ -48,15 +55,27 @@ export default function Orders() {
     }
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  const handlePageChange = async (url) => {
+    try {
+      setLoading(true);
+      const response = await api.get(url);
+      setOrders(response.data.results);
+      setPagination({
+        next: response.data.next,
+        previous: response.data.previous,
+        count: response.data.count,
+      });
+    } catch (err) {
+      handleError(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancelOrder = async (orderId) => {
     try {
       await api.patch(`/orders/${orderId}/cancel/`);
       toast.success('Order cancelled successfully');
-      // Refresh orders after cancellation
       const updatedOrders = orders.map((order) =>
         order.id === orderId ? { ...order, status: 'cancelled' } : order,
       );
@@ -65,6 +84,11 @@ export default function Orders() {
       handleError(err);
     }
   };
+
+  const totalPages = Math.ceil(pagination.count / ordersPerPage);
+  const currentPage = pagination.next
+    ? parseInt(new URL(pagination.next).searchParams.get('page')) - 1
+    : totalPages;
 
   if (loading)
     return (
@@ -163,19 +187,26 @@ export default function Orders() {
         ))}
       </div>
 
-      {/* Pagination */}
+      {/* Pagination Controls */}
       <div className="flex justify-center mt-8 gap-2">
         <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          onClick={() => handlePageChange(pagination.previous)}
+          disabled={!pagination.previous}
           className="px-3 py-1 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
+
         {Array.from({ length: totalPages }, (_, index) => (
           <button
             key={index + 1}
-            onClick={() => handlePageChange(index + 1)}
+            onClick={() =>
+              handlePageChange(
+                `http://127.0.0.1:8000/api/v1/orders/?page=${
+                  index + 1
+                }&page_size=${ordersPerPage}`,
+              )
+            }
             className={`px-3 py-1 rounded-lg ${
               currentPage === index + 1
                 ? 'bg-indigo-600 text-white'
@@ -185,9 +216,10 @@ export default function Orders() {
             {index + 1}
           </button>
         ))}
+
         <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(pagination.next)}
+          disabled={!pagination.next}
           className="px-3 py-1 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
         >
           <ChevronRight className="w-5 h-5" />
